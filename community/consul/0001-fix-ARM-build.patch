@@ -1,0 +1,25 @@
+From ea2da7ffd718d4b9d8448fdac97ea5b387ab72d9 Mon Sep 17 00:00:00 2001
+From: Kevin Mihelich <kevin@archlinuxarm.org>
+Date: Tue, 26 Jun 2018 06:43:01 -0600
+Subject: [PATCH] fix ARM build
+
+---
+ GNUmakefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/GNUmakefile b/GNUmakefile
+index 1a89de16..e4e1d97d 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -119,7 +119,7 @@ changelogfmt:
+ 
+ # linux builds a linux package independent of the source platform
+ linux:
+-	@$(SHELL) $(CURDIR)/build-support/scripts/build-local.sh -o linux -a amd64
++	@$(SHELL) $(CURDIR)/build-support/scripts/build-local.sh -o linux -a $(GOARCH)
+ 
+ # dist builds binaries for all platforms and packages them for distribution
+ dist:
+-- 
+2.17.1
+

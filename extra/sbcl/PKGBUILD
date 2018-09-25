@@ -5,25 +5,25 @@
 # Contributor: Leslie Polzer (skypher)
 
 # ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
-#  - disable sb-thread, not supported on ARM
+#  - disable sb-thread on 32-bit ARM: not supported
+#  - enable sb-thread and largefile on AArch64
 
-buildarch=4
+buildarch=12
 
 pkgname=sbcl
-pkgver=1.4.0
+pkgver=1.4.10
 pkgrel=1
 pkgdesc="Steel Bank Common Lisp"
 url="http://www.sbcl.org/"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 depends=('zlib')
 provides=('common-lisp' 'cl-asdf')
 makedepends=('sbcl')
 source=("https://downloads.sourceforge.net/project/sbcl/sbcl/$pkgver/$pkgname-$pkgver-source.tar.bz2"
   "arch-fixes.lisp")
-sha256sums=('08d59ca79f78311304664d5093764cda94ff2693d92736d1321fa6074b570769'
+sha256sums=('904ee7e90fd6d66dfb4da578ec9e3dab1a2a49b61b13fa1fbf30ce8b80593cc9'
             'b5a6468dcbc1012cae2c3cda155762a37b6d96ef89bba4f723315063b0b5e7ce')
-
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -34,17 +34,22 @@ build() {
   export LINKFLAGS="$LDFLAGS"
   unset LDFLAGS
   unset MAKEFLAGS
-  if [[ ${CARCH} = x86_64  ]]; then
+  if [[ ${CARCH} = x86_64 || ${CARCH} = aarch64 ]]; then
     enable_disable_largefile=enable
   else
     enable_disable_largefile=disable
+  fi
+  if [[ ${CARCH} = aarch64 ]]; then
+    enable_disable_thread=enable
+  else
+    enable_disable_thread=disable
   fi
   # Make a multi-threaded SBCL, disable LARGEFILE
   cat >customize-target-features.lisp <<EOF
 (lambda (features)
   (flet ((enable (x) (pushnew x features))
          (disable (x) (setf features (remove x features))))
-  (disable :sb-thread)
+  (${enable_disable_thread} :sb-thread)
   (enable :sb-core-compression)
   (${enable_disable_largefile} :largefile)))
 EOF

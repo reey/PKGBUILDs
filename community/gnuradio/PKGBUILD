@@ -1,4 +1,3 @@
-# $Id$
 # Maintainer: Kyle Keen <keenerd@gmail.com>
 # Contributor: Dominik Heidler <dheidler@gmail.com>
 # Contributor:	Jonatan Sastre <jsastreh [ at ] hotmail.com>
@@ -8,8 +7,8 @@
 
 pkgbase=gnuradio
 pkgname=(gnuradio gnuradio-companion)
-pkgver=3.7.11
-pkgrel=5
+pkgver=3.7.13.4
+pkgrel=3
 pkgdesc="General purpose DSP and SDR toolkit.  With drivers for usrp and fcd."
 arch=('x86_64')
 url="http://gnuradio.org"
@@ -17,7 +16,7 @@ license=('GPL')
 depends=('fftw' 'python2-numpy' 'cppunit' 'gsl' 'blas' 'boost-libs>=1.53'
     'libusbx' 'portaudio' 'libuhd' 'zeromq' 'libvolk')
 makedepends=('boost' 'cmake' 'python2-lxml' 'python2-cheetah' 'glu' 'swig'
-    'pygtk' 'wxpython' 'python2-pyqwt' 'qwtplot3d')
+    'pygtk' 'wxpython' 'qwtplot3d' 'qwt5')
 
 # todo
 # split the gui components?
@@ -34,12 +33,16 @@ makedepends=('boost' 'cmake' 'python2-lxml' 'python2-cheetah' 'glu' 'swig'
 #source=("http://s3-dist.gnuradio.org/gnuradio-$pkgver.tar.gz"
 source=("https://gnuradio.org/releases/$pkgbase/$pkgbase-$pkgver.tar.gz"
         "https://gnuradio.org/releases/$pkgbase/$pkgbase-$pkgver.tar.gz.asc"
-        "21-fcd.rules" "gnuradio-gcc7.patch")
-validpgpkeys=('B90DDFAC56989BF62262EB812987C77CBB8ED9B2') # GNU Radio Project
-md5sums=('7b7b871237ae6fc109d203f78c4654ef'
+        "21-fcd.rules" "gnuradio-gcc7.patch"
+        "boost-1.67.patch" "boost-1.67-pthread.patch")
+validpgpkeys=('B90DDFAC56989BF62262EB812987C77CBB8ED9B2'  # GNU Radio Project
+              'D74F9F146E7F755783583158B343B2BA293E5174') # Marcus Müller
+md5sums=('b38d9cfa7cb4dcb97f5d19ebcabe8dcb'
          'SKIP'
          '465e12c454c6a22ebec9849181af7bdc'
-         'c510104fa2ad9852a683c265c42ae1da')
+         'c510104fa2ad9852a683c265c42ae1da'
+         '204b87f1663411c17e5b40e9073e9d48'
+         '7f177cb699393cb4141d8eaa927c0c4a')
 
 prepare() {
   cd "$srcdir/$pkgbase-$pkgver"
@@ -50,7 +53,15 @@ prepare() {
   sed -i -e "s|#![ ]*/usr/bin/env /usr/bin/python$|#!/usr/bin/env python2|" \
     $(find ./ -name '*.py')
   # fix build with GCC 7 (Fedora)
-  patch -p1 -i ../gnuradio-gcc7.patch
+  #patch -p1 -N -i ../gnuradio-gcc7.patch
+  # https://github.com/gnuradio/gnuradio/pull/1733
+  #patch -p1 -N -i ../boost-1.67.patch
+  #patch -p1 -N -i ../boost-1.67-pthread.patch
+  # GCC 7? 
+  #sed -i 's|SET(CMAKE_CXX_STANDARD 98)|#&|' CMakeLists.txt
+  #sed -i 's|SET(CMAKE_C_FLAGS .* -std=gnu99"|#&|' CMakeLists.txt
+  sed -i '333i ${CMAKE_THREAD_LIBS_INIT}' gr-blocks/lib/CMakeLists.txt
+  sed -e '/PyQt4/d' -i gr-qtgui/CMakeLists.txt # Build PyQt4 UI even if PyQt4 is not installed
 }
 
 build() {
@@ -70,6 +81,7 @@ build() {
     -DPYTHON_INCLUDE_DIR=$(echo /usr/include/python2*) \
     -DENABLE_GR_QTGUI=ON \
     -DPYTHON_LIBRARY=$(echo /usr/lib/libpython2.*.so) \
+    -DPYQT4_FOUND=ON \
     -DENABLE_INTERNAL_VOLK=OFF \
     -DENABLE_GRC=ON \
     -DENABLE_GR_WXGUI=ON \
@@ -99,7 +111,7 @@ package_gnuradio() {
 package_gnuradio-companion() {
   pkgdesc="GUI frontend for gnuradio and SDR."
   depends=('gnuradio' 'python2-cheetah' 'python2-lxml'
-      'pygtk' 'wxpython' 'python2-opengl' 'python2-pyqwt' 'qwtplot3d'
+      'pygtk' 'wxpython' 'python2-opengl' 'qwt5' 'qwtplot3d'
       'python2-numarray')
   # Yup, nothing in the package except dependencies,
   # because more than five optdeps is too many for most people.

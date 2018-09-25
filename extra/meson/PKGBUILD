@@ -7,28 +7,30 @@
 #  - remove checkdepend on dmd
 
 pkgname=meson
-pkgver=0.45.0
-pkgrel=1
+pkgver=0.48.0
+pkgrel=2
 pkgdesc='High productivity build system'
 url='http://mesonbuild.com/'
 arch=('any')
 license=('Apache')
-depends=('python' 'ninja')
-makedepends=('python-setuptools')
-checkdepends=('gcc-objc' 'vala' 'rust' 'gcc-fortran' 'mono' 'boost' 'qt4' 'qt5-base' 'git'
-              'cython' 'gtkmm3' 'gtest' 'gmock' 'protobuf' 'wxgtk' 'python-gobject' 'gobject-introspection'
+depends=('python-setuptools' 'ninja')
+checkdepends=('gcc-objc' 'vala' 'rust' 'gcc-fortran' 'mono' 'boost' 'qt4' 'qt5-base' 'git' 'cython'
+              'gtkmm3' 'gtest' 'gmock' 'protobuf' 'wxgtk' 'python-gobject' 'gobject-introspection'
               'itstool' 'gtk3' 'java-environment=8' 'gtk-doc' 'llvm' 'clang' 'sdl2' 'graphviz'
-              'doxygen' 'vulkan-validation-layers' 'openmpi' 'openssh' 'mercurial' 'gtk-sharp-2'
-              'qt5-tools' 'libwmf' 'valgrind')
+              'doxygen' 'vulkan-validation-layers' 'openssh' 'mercurial' 'gtk-sharp-2' 'qt5-tools'
+              'libwmf' 'valgrind')
 source=(https://github.com/mesonbuild/meson/releases/download/${pkgver}/meson-${pkgver}.tar.gz{,.asc}
         arch-meson)
-sha512sums=('4bf9168b1481c0b82c42ec93543d6835c0a961f6e123d41c13b2d7983132f77bf55ea70afe4c531706a307c83b248c3f8e6dcd0116792be41408b59efe835dd1'
+sha512sums=('33ddb6b36ad6a4d4e7bbc2f9b3c8cab103142b88ed6fcf8c727341ad5339209f183e8fdd0177a28d4394f7635e1127182760ea63c0c6ded3a8d41fe64584ee7c'
             'SKIP'
-            'b9f86ded46ad7fc4c4cbd997bd2210e363f02189377d9159cae4a52d0bd8bb9e02de1680bc76f63ecd923922f9cbdba40efbe09231dc24fc1d445ed97c2f5132')
+            '0e537c4fc04535decf901713f05d895dd8b93f2136e463b4a5adc5f2bf3a3e4c4ee07b5936fd7d01309af75a50fb1dc8d842b953c039ffe096efd54fd86aa7d0')
 validpgpkeys=('95181F4EED14FDF4E41B518D3BF4693BFEEB9428') # Jussi Pakkanen <jpakkane@gmail.com>
 
 prepare() {
   cd ${pkgname}-${pkgver}
+
+  # Succeeds for us?
+  mv 'test cases/failing/85 gtest dependency with version' 'test cases/frameworks/'
 }
 
 build() {
@@ -38,9 +40,6 @@ build() {
 
 check() (
   cd ${pkgname}-${pkgver}
-
-  # --as-needed breaks openmpi linking
-  LDFLAGS="${LDFLAGS/,--as-needed/}"
 
   # set for debug output
   #export MESON_PRINT_TEST_OUTPUT=1
@@ -53,7 +52,7 @@ package() {
   cd ${pkgname}-${pkgver}
   python setup.py install --root="${pkgdir}" --optimize=1 --skip-build
 
-  mkdir -p "${pkgdir}/usr/share/vim/vimfiles"
+  install -d "${pkgdir}/usr/share/vim/vimfiles"
   cp -rt "${pkgdir}/usr/share/vim/vimfiles" data/syntax-highlighting/vim/*
 
   install -Dt "${pkgdir}/usr/share/emacs/site-lisp" -m644 data/syntax-highlighting/emacs/*

@@ -1,31 +1,26 @@
-# $Id$
 # Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
 
-# ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
-#  - removed intel-tbb from deps
-#  - set -DUSE_LLVM_BITCODE=OFF for v5 and v6
+# remove when bumped upstream
 
 pkgname=openshadinglanguage
-pkgver=1.7.6
-pkgrel=4
+pkgver=1.9.10
+pkgrel=2.1
 pkgdesc="Advanced shading language for production GI renderers"
 arch=(x86_64)
 url="https://github.com/imageworks/OpenShadingLanguage"
 license=('custom')
-depends=('boost-libs' 'openimageio' 'openexr' 'freetype2' 'libpng'
+depends=('boost-libs' 'openimageio' 'openexr' 'intel-tbb' 'freetype2' 'libpng'
          'libtiff' 'zlib' 'ncurses')
-makedepends=('boost' 'cmake' 'llvm35' 'clang35')
-source=(https://github.com/imageworks/OpenShadingLanguage/archive/Release-${pkgver}.tar.gz
-        llvm-static-system-libs.patch)
-sha512sums=('c0f0f1aece6be0aca9751dd53063b2f3f14482d21304e0606c21f786d00adfb92025ca10c928bbc9b591a862aada0393efd62b4e27e39669e013264a2cb5c1ef'
-            '50f1e9a3e88b0b4e328778d4d8eb30989e1dfed0abe1bb84681dc8d368f343f3052dd975d7d500113d39f34bb8b59415c7a4e6dd841bc8d44de250a3b7f6aeec')
+makedepends=('boost' 'cmake' 'python' 'llvm' 'clang')
+source=(https://github.com/imageworks/OpenShadingLanguage/archive/Release-${pkgver}.tar.gz)
+sha512sums=('61c52cb673863bd67e257aef2c37026a49c392de9a41739e07926f8dd878f6c90ac2da6224eb3f78b8ba8e6ca121502ba41c65a6c3353f3cb7fec631a43f016b')
 
 prepare() {
   cd OpenShadingLanguage-Release-$pkgver
 
   # Add system libraries needed to link against LLVM components (zlib, ncurses)
   # This is required in order to statically link against LLVM
-  patch -Np1 < $srcdir/llvm-static-system-libs.patch
+  #patch -Np1 < $srcdir/llvm-static-system-libs.patch
 }
 
 build() {
@@ -34,15 +29,12 @@ build() {
   [[ -d build ]] && rm -r build
   mkdir build && cd build
 
-  [ "${CARCH}" == "arm" -o "${CARCH}" == "armv6h" ] && BITCODE="-DUSE_LLVM_BITCODE=OFF"
-
   cmake ../.. \
     -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DLLVM_STATIC=0 \
     -DENABLERTTI=ON \
-    -DLLVM_STATIC=1 \
-    -DOSL_BUILD_CPP11=1 \
-    -DSTOP_ON_WARNING=OFF \
-    $BITCODE
+    -DSTOP_ON_WARNING=OFF
   make
 }
 
@@ -50,13 +42,10 @@ package() {
   cd OpenShadingLanguage-Release-$pkgver/src/build
 
   make DESTDIR="$pkgdir/" install
-
-  mkdir -p "$pkgdir"/usr/share/OSL/
-  mkdir -p "$pkgdir"/usr/share/licenses/$pkgname
-  mv "$pkgdir"/usr/LICENSE "$pkgdir"/usr/share/licenses/$pkgname # TODO: Tell upstream about this shit
-  mv "$pkgdir"/usr/{CHANGES,README.md,INSTALL} "$pkgdir"/usr/share/OSL/
-  mv "$pkgdir"/usr/doc "$pkgdir"/usr/share/OSL/doc
+  mkdir "$pkgdir"/usr/share/OSL
   mv "$pkgdir"/usr/shaders "$pkgdir"/usr/share/OSL/shaders
+
+  install -Dm644 "$pkgdir"/usr/share/doc/OSL/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 }
 
 # vim:set ts=2 sw=2 et:

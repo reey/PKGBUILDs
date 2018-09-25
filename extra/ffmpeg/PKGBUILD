@@ -1,4 +1,3 @@
-# $Id$
 # Maintainer: Maxime Gauduin <alucryd@archlinux.org>
 # Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 # Contributor: Ionut Biru <ibiru@archlinux.org>
@@ -7,46 +6,38 @@
 
 # ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
 #  - use -fPIC in host cflags for armv7 to fix print_options.c compile
+#  - remove makedepends on ffnvcodec-headers, remove --enable-nvenc, --enable-nvdec
+#  - remove depends on aom, remove --enable-libaom
 
 pkgname=ffmpeg
-pkgver=3.4.2
-pkgrel=2
+pkgver=4.0.2
+pkgrel=3
 epoch=1
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
 url='http://ffmpeg.org/'
 license=('GPL3')
-depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'glibc' 'gmp' 'gnutls' 'gsm'
-         'jack' 'lame' 'libavc1394' 'libiec61883' 'libmodplug' 'libpulse'
-         'libraw1394' 'libsoxr' 'libssh' 'libtheora' 'libvdpau' 'libwebp'
-         'libx11' 'libxcb' 'libxml2' 'opencore-amr' 'openjpeg2' 'opus' 'sdl2'
-         'speex' 'v4l-utils' 'xz' 'zlib'
-         'libomxil-bellagio'
-         'libass.so' 'libbluray.so' 'libfreetype.so' 'libva-drm.so' 'libva.so'
-         'libva-x11.so' 'libvidstab.so' 'libvorbisenc.so' 'libvorbis.so'
-         'libvpx.so' 'libx264.so' 'libx265.so' 'libxvidcore.so')
-makedepends=('ladspa' 'libvdpau' 'yasm')
+depends=(
+  'alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'glibc' 'gmp' 'gnutls' 'gsm'
+  'jack' 'lame' 'libavc1394' 'libdrm' 'libiec61883' 'libmodplug'
+  'libomxil-bellagio' 'libpulse' 'libraw1394' 'libsoxr' 'libssh' 'libtheora'
+  'libvdpau' 'libwebp' 'libx11' 'libxcb' 'libxext' 'libxml2' 'libxv'
+  'opencore-amr' 'openjpeg2' 'opus' 'sdl2' 'speex' 'v4l-utils' 'xz' 'zlib'
+  'libass.so' 'libbluray.so' 'libfreetype.so' 'libva-drm.so' 'libva.so'
+  'libva-x11.so' 'libvidstab.so' 'libvorbisenc.so' 'libvorbis.so' 'libvpx.so'
+  'libx264.so' 'libx265.so' 'libxvidcore.so'
+)
+makedepends=('git' 'ladspa' 'yasm')
 optdepends=('ladspa: LADSPA filters')
-provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
-          'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
-          'libswscale.so')
-source=("https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.xz"{,.asc}
-        'fs56089.patch')
-validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('2b92e9578ef8b3e49eeab229e69305f5f4cbc1fdaa22e927fc7fca18acccd740'
-            'SKIP'
-            '0bfcd12d1992903f21c146ae56d9ad89b52818cfb2303197ee905347c25a5427')
-
-prepare() {
-  cd ffmpeg-${pkgver}
-
-  # https://bugs.archlinux.org/task/56089
-  # Backport of http://git.videolan.org/?p=ffmpeg.git;a=commitdiff;h=a606f27f4c610708fa96e35eed7b7537d3d8f712
-  patch -Np1 -i ../fs56089.patch
-}
+provides=(
+  'libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
+  'libavutil.so' 'libpostproc.so' 'libswresample.so' 'libswscale.so'
+)
+source=("git+https://git.ffmpeg.org/ffmpeg.git#tag=n${pkgver}")
+sha256sums=('SKIP')
 
 build() {
-  cd ffmpeg-${pkgver}
+  cd ffmpeg
 
   [[ $CARCH == "armv7h" || $CARCH == "aarch64" ]] && CONFIG='--host-cflags="-fPIC"'
 
@@ -55,8 +46,6 @@ build() {
     --disable-debug \
     --disable-static \
     --disable-stripping \
-    --enable-avisynth \
-    --enable-avresample \
     --enable-fontconfig \
     --enable-gmp \
     --enable-gnutls \
@@ -64,10 +53,12 @@ build() {
     --enable-ladspa \
     --enable-libass \
     --enable-libbluray \
+    --enable-libdrm \
     --enable-libfreetype \
     --enable-libfribidi \
     --enable-libgsm \
     --enable-libiec61883 \
+    --enable-libjack \
     --enable-libmodplug \
     --enable-libmp3lame \
     --enable-libopencore_amrnb \
@@ -89,21 +80,19 @@ build() {
     --enable-libxcb \
     --enable-libxml2 \
     --enable-libxvid \
+    --enable-omx \
     --enable-shared \
     --enable-version3 \
-    --enable-omx \
     $CONFIG
 
   make
   make tools/qt-faststart
-  make doc/ff{mpeg,play,server}.1
+  make doc/ff{mpeg,play}.1
 }
 
 package() {
-  cd ffmpeg-${pkgver}
-
-  make DESTDIR="${pkgdir}" install install-man
-  install -Dm 755 tools/qt-faststart "${pkgdir}"/usr/bin/
+  make DESTDIR="${pkgdir}" -C ffmpeg install install-man
+  install -Dm 755 ffmpeg/tools/qt-faststart "${pkgdir}"/usr/bin/
 }
 
 # vim: ts=2 sw=2 et:

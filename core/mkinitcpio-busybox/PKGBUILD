@@ -1,4 +1,3 @@
-# $Id$
 # Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 # Contributor: Dave Reisner <dreisner@archlinux.org>
 # Contributor: Thomas Bächler <thomas@archlinux.org>
@@ -7,7 +6,7 @@
 #  - removed -mtune, changed -march to v8/v7/v6/v5 compat
 
 pkgname=mkinitcpio-busybox
-pkgver=1.28.1
+pkgver=1.29.3
 pkgrel=1
 pkgdesc='Base initramfs tools'
 arch=(x86_64)
@@ -17,8 +16,8 @@ depends=(glibc)
 options=(!buildflags)
 source=(https://busybox.net/downloads/busybox-$pkgver.tar.bz2
         config)
-sha256sums=('98fe1d3c311156c597cd5cfa7673bb377dc552b6fa20b5d3834579da3b13652e'
-            'cb97bf879450457c97cb2a2b6c0e4821ce6fc8962cca36e4039b3d7e8498bf38')
+sha256sums=('97648636e579462296478e0218e65e4bc1e9cd69089a3b1aeb810bff7621efb7'
+            '2d23922f81a2ebd014463b8ec8d9a6c9845300b921c3a207d4a9144c3cb21cc5')
 
 prepare() {
   cd "busybox-$pkgver"

@@ -1,5 +1,5 @@
-# $Id$
-# Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 # Contributor: Marius Knaust <marius.knaust@gmail.com>
 # Contributor: Ionut Biru <ibiru@archlinux.org>
 # Contributor: Stéphane Gaudreault <stephane@archlinux.org>
@@ -12,19 +12,18 @@
 #  - changed _bindir to .linuxarm from .linuxx86
 #  - build armv6h with -march=armv6k
 #  - specify arm architecture to b2 for aarch64
-#  - build armv5 with c++98, can't support c++11 code in boost
 
 pkgbase=boost
 pkgname=('boost-libs' 'boost')
-pkgver=1.66.0
+pkgver=1.68.0
 _boostver=${pkgver//./_}
-pkgrel=1
+pkgrel=1.1
 url='http://www.boost.org/'
 arch=('x86_64')
 license=('custom')
-makedepends=('icu>=55.1' 'python' 'python2' 'python-numpy' 'python2-numpy' 'bzip2' 'zlib' 'openmpi')
+makedepends=('icu' 'python' 'python2' 'python-numpy' 'python2-numpy' 'bzip2' 'zlib' 'openmpi')
 source=(https://downloads.sourceforge.net/project/${pkgbase}/${pkgbase}/${pkgver}/${pkgbase}_${_boostver}.tar.bz2)
-sha256sums=('5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9')
+sha256sums=('7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7')
 
 build() {
    CFLAGS=`echo $CFLAGS | sed -e 's/armv6/armv6k/'` && CXXFLAGS="$CFLAGS"
@@ -45,12 +44,6 @@ build() {
    install -dm755 "${_stagedir}"/share/boostbook
    cp -a tools/boostbook/{xsl,dtd} "${_stagedir}"/share/boostbook/
 
-   if [[ $CARCH == "arm" ]]; then
-      STD="c++98"
-   else
-      STD="c++14"
-   fi
-
    # default "minimal" install: "release link=shared,static
    # runtime-link=shared threading=single,multi"
    # --layout=tagged will add the "-mt" suffix for multithreaded libraries
@@ -67,7 +60,7 @@ build() {
       toolset=gcc \
       python=2.7 \
       cflags="${CPPFLAGS} ${CFLAGS} -fPIC -O3" \
-      cxxflags="${CPPFLAGS} ${CXXFLAGS} -std=${STD} -fPIC -O3" \
+      cxxflags="${CPPFLAGS} ${CXXFLAGS} -std=c++14 -fPIC -O3" \
       linkflags="${LDFLAGS}" \
       --layout=system \
       ${JOBS} \
@@ -91,9 +84,9 @@ build() {
       runtime-link=shared \
       link=shared,static \
       toolset=gcc \
-      python=3.6 \
+      python=3.7 \
       cflags="${CPPFLAGS} ${CFLAGS} -fPIC -O3" \
-      cxxflags="${CPPFLAGS} ${CXXFLAGS} -std=${STD} -fPIC -O3" \
+      cxxflags="${CPPFLAGS} ${CXXFLAGS} -std=c++14 -fPIC -O3" \
       linkflags="${LDFLAGS}" \
       --layout=system \
       ${JOBS} \
@@ -129,8 +122,6 @@ package_boost-libs() {
    pkgdesc='Free peer-reviewed portable C++ source libraries - runtime libraries'
    depends=('bzip2' 'zlib' 'icu')
    optdepends=('openmpi: for mpi support')
-
-   # powerdns-recursor keeps being rebuild against outdated boost-libs
    provides=('libboost_context.so')
 
    install -dm755 "${pkgdir}"/usr
@@ -138,6 +129,14 @@ package_boost-libs() {
    cp -a "${_stagedir}"/python3/lib/libboost_* "${pkgdir}"/usr/lib
    rm "${pkgdir}"/usr/lib/*.a
 
+   # https://github.com/boostorg/python/issues/203#issuecomment-391477685
+   for _lib in python numpy; do
+     ln -srL "${pkgdir}"/usr/lib/libboost_${_lib}{27,}.so
+     ln -srL "${pkgdir}"/usr/lib/libboost_${_lib}3{7,}.so
+   done
+
    install -Dm644 "${srcdir}/"${pkgbase}_${_boostver}/LICENSE_1_0.txt \
       "${pkgdir}"/usr/share/licenses/boost-libs/LICENSE_1_0.txt
 }
+
+# vim: ts=2 sw=2 et:

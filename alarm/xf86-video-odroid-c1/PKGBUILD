@@ -5,19 +5,27 @@ buildarch=4
 
 pkgname=xf86-video-odroid-c1
 pkgver=0.5
-pkgrel=7
+pkgrel=9
 pkgdesc="X.org Mali video driver for ODROID-C1"
 arch=(armv7h)
 license=('custom')
 url="http://www.hardkernel.com/"
 depends=('odroid-c1-libgl-x11')
-makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=23' 'git' 'odroid-c1-libgl-headers')
-conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<23' 'X-ABI-VIDEODRV_VERSION>=24')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=24.0' 'git' 'odroid-c1-libgl-headers')
+conflicts=('xorg-server<1.20' 'X-ABI-VIDEODRV_VERSION<24' 'X-ABI-VIDEODRV_VERSION>=25')
 source=("git+https://github.com/mdrjr/c1_mali_ddx.git")
 sha256sums=('SKIP')
 
 build() {
   cd c1_mali_ddx
+
+  # Since pacman 5.0.2-2, hardened flags are now enabled in makepkg.conf
+  # With them, module fail to load with undefined symbol.
+  # See https://bugs.archlinux.org/task/55102 / https://bugs.archlinux.org/task/54845
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/,-z,now}
+
   LDFLAGS+=" -L/usr/lib/mali-egl"
   ./configure --prefix=/usr
   make

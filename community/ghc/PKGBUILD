@@ -4,7 +4,7 @@
 # Contributor: Thomas Dziedzic <gostrc@gmail.com>
 
 # ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
-#  - depend on llvm39, make -j1
+#  - depend on llvm50, make -j1
 
 buildarch=4
 
@@ -17,7 +17,7 @@ shopt -s extglob
 
 pkgbase=ghc
 pkgname=(ghc-libs ghc ghc-static)
-pkgver=8.2.2
+pkgver=8.4.3
 pkgrel=1
 pkgdesc='The Glasgow Haskell Compiler'
 arch=('x86_64')
@@ -26,12 +26,14 @@ license=('custom')
 makedepends=('ghc-static' 'perl' 'libxslt' 'docbook-xsl' 'python-sphinx' 'haskell-hscolour'
              'texlive-bin' 'texlive-latexextra' 'ttf-dejavu')
 source=("https://downloads.haskell.org/~ghc/$pkgver/$pkgbase-${pkgver}-src.tar.xz"
-        ghc-rebuild-doc-index.hook ghc-register.hook ghc-unregister.hook)
+        ghc-rebuild-doc-index.hook ghc-register.hook ghc-unregister.hook
+        0001-llvm-targets-Add-armv6l-unknown-linux-gnueabihf-and-.patch)
 noextract=("$pkgbase-${pkgver}-src.tar.xz")
-sha512sums=('6549416f470b599973d409fa45f59c25b07e6a94798cef1a19ad432547dc225338cf4dbc4a4793114b4a417798a3b59b122b92b020251074405c5302b7ffe799'
+sha512sums=('c6cea84264f32ae888f9931f834a1d721889242f656d14262e787ec54a1793d1862ce76daacaf1006c12b8af12919501afce1dc02571373e24830e4d51803414'
             'afb119e4f665770c5704b97034d2488504eaa7afcddca2fb6b554079921cd2330599bcb5c36669f0d0e7856dd99ae1deeca1b0e97e2371a783f26e5ef9776ba9'
             'bd65a369b618ec9bee46c028c2b6acff8f883f60f6cad6e5be8561fbcef6118278abec11bb86f9e6f92cb2e05ad74ec54611c1788e8ed95187d0091fcbbf8767'
-            'd4bfdd4c8ad9ac612cf187fec150850e9f4068a4a4202503c00dba07ba26f804bc11d7181249f7e3452d7ede60dc5dedea34e73fdb584ac2953068b51c6fd5ad')
+            'd4bfdd4c8ad9ac612cf187fec150850e9f4068a4a4202503c00dba07ba26f804bc11d7181249f7e3452d7ede60dc5dedea34e73fdb584ac2953068b51c6fd5ad'
+            '0d46375b5d864d8e8268becf52ab66d9d51e459a1ff7ef71ca77c4d8bc65e2952b29be6acc55750aaab07c52fcb9e9bddc279d7292696fcfc578a44e5eca16a3')
 
 prepare() {
   # Need to extract this tarball with a UTF-8 locale instead of a chroot's "C"
@@ -43,6 +45,8 @@ prepare() {
 
   cp mk/build.mk{.sample,}
   sed -i '1iBuildFlavour = perf' mk/build.mk
+
+  patch -p1 -i ../0001-llvm-targets-Add-armv6l-unknown-linux-gnueabihf-and-.patch
 }
 
 build() {
@@ -77,7 +81,7 @@ package_ghc() {
   pkgdesc='The Glasgow Haskell Compiler'
   provides=("haskell-ghc=$pkgver")
   replaces=("haskell-ghc")
-  depends=('ghc-libs')
+  depends=('gcc' 'ghc-libs')
 
   cd ghc-$pkgver
   make DESTDIR="$pkgdir" -j1 install
@@ -100,32 +104,35 @@ package_ghc() {
 package_ghc-libs() {
   pkgdesc='The Glasgow Haskell Compiler - Dynamic Libraries'
   install='ghc.install'
-  depends=('gcc' 'gmp' 'libffi' 'perl' 'llvm39')
+  depends=('gmp' 'libffi' 'perl' 'llvm50')
   provides=('haskell-array=0.5.2.0'
-            'haskell-base=4.10.1.0'
+            'haskell-base=4.11.1.0'
             'haskell-binary=0.8.5.1'
             'haskell-bytestring=0.10.8.2'
-            'haskell-containers=0.5.10.2'
+            'haskell-containers=0.5.11.0'
             'haskell-deepseq=1.4.3.0'
-            'haskell-directory=1.3.0.2'
-            'haskell-filepath=1.4.1.2'
-            'haskell-ghc-boot=8.2.2'
-            'haskell-ghc-boot-th=8.2.2'
+            'haskell-directory=1.3.1.5'
+            'haskell-filepath=1.4.2'
+            'haskell-ghc-boot=8.4.3'
+            'haskell-ghc-boot-th=8.4.3'
             'haskell-ghc-compact=0.1.0.0'
-            'haskell-ghc-prim=0.5.1.1'
-            'haskell-haskeline=0.7.4.0'
-            'haskell-hoopl=3.10.2.2'
+            'haskell-ghc-prim=0.5.2.0'
+            'haskell-haskeline=0.7.4.2'
             'haskell-hpc=0.6.0.3'
-            'haskell-integer-gmp=1.0.1.0'
-            'haskell-pretty=1.1.3.3'
-            'haskell-process=1.6.1.0'
-            'haskell-template-haskell=2.12.0.0'
-            'haskell-terminfo=0.4.1.0'
+            'haskell-integer-gmp=1.0.2.0'
+            'haskell-mtl=2.2.2'
+            'haskell-parsec=3.1.13.0'
+            'haskell-pretty=1.1.3.6'
+            'haskell-process=1.6.3.0'
+            'haskell-stm=2.4.5.0'
+            'haskell-template-haskell=2.13.0.0'
+            'haskell-terminfo=0.4.1.1'
+            'haskell-text=1.2.3.0'
             'haskell-time=1.8.0.2'
-            'haskell-transformers=0.5.2.0'
+            'haskell-transformers=0.5.5.0'
             'haskell-unix=2.7.2.2'
-            'haskell-xhtml=3000.2.2'
-            'haskell-cabal=2.0.1.0')
+            'haskell-xhtml=3000.2.2.1'
+            'haskell-cabal=2.2.0.1')
   replaces=('haskell-array'
             'haskell-base'
             'haskell-binary'
@@ -139,13 +146,16 @@ package_ghc-libs() {
             'haskell-ghc-compact'
             'haskell-ghc-prim'
             'haskell-haskeline'
-            'haskell-hoopl'
             'haskell-hpc'
             'haskell-integer-gmp'
+            'haskell-mtl'
+            'haskell-parsec'
             'haskell-pretty'
             'haskell-process'
+            'haskell-stm'
             'haskell-template-haskell'
             'haskell-terminfo'
+            'haskell-text'
             'haskell-time'
             'haskell-transformers'
             'haskell-unix'

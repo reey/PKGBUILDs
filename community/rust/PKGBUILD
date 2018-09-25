@@ -1,4 +1,3 @@
-# $Id$
 # Maintainer: Johannes Löthberg <johannes@kyriasis.com>
 # Contributor: Alexander F Rødseth <xyproto@archlinux.org>
 # Contributor: Daniel Micay <danielmicay@gmail.com>
@@ -11,32 +10,37 @@
 buildarch=28
 highmem=1
 
+# Remember to bump lib32-rust as well!
+
 pkgname=('rust' 'rust-docs')
 epoch=1
-pkgver=1.24.1
-pkgrel=1
+pkgver=1.29.0
+pkgrel=2
 
 pkgdesc='Systems programming language focused on safety, speed and concurrency'
 url='https://www.rust-lang.org/'
 arch=('x86_64')
 license=('MIT' 'Apache')
 
-makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake')
+makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake' 'ninja')
 
 options=('!emptydirs')
 
 source=("https://static.rust-lang.org/dist/rustc-$pkgver-src.tar.gz"{,.asc}
-        bootstrap-config.toml)
+        config.toml
+        https://github.com/rust-lang/rust/commit/1b94b84ad0143ea2039610e3aec9e929a8a20733.patch)
 
-sha256sums=('3ea53d45e8d2e9a41afb3340cf54b9745f845b552d802d607707cf04450761ef'
+sha256sums=('a4eb34ffd47f76afe2abd813f398512d5a19ef00989d37306217c9c9ec2f61e9'
             'SKIP'
-            '8e30fcd8633e1900056ecbcc7267fea23e8e08889460239c614d4dcd796ce4f3')
+            'ff4890bd733509b0dbb885d69afd578c41fc583af256dcc81e9239339c60b144'
+            '8c8e79b0bac0dd1434c49f665abfa50634ffb0fbb35c9efee511e5b97960b9e2')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
 
 prepare() {
   cd "rustc-$pkgver-src"
 
-  cp "$srcdir"/bootstrap-config.toml config.toml
+  patch -p1 <"$srcdir"/1b94b84ad0143ea2039610e3aec9e929a8a20733.patch
+  cp "$srcdir"/config.toml config.toml
 
   if [[ $CARCH == armv7h ]]; then
     mkdir path
@@ -76,6 +80,9 @@ package_rust() {
 
   # move docs out of the way
   mv "$pkgdir/usr/share/doc" "$srcdir/"
+
+  install -d "$pkgdir"/usr/share/bash-completion
+  mv "$pkgdir"/etc/bash_completion.d/ "$pkgdir"/usr/share/bash-completion/completions/
 }
 
 package_rust-docs() {

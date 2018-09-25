@@ -1,4 +1,3 @@
-# $Id: PKGBUILD 86795 2013-03-22 10:46:14Z svenstaro $
 # Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
 # Maintainer: Antonio Rojas <arojas@archlinux.org>
 # Contributor: Imanol Celaya <ornitorrincos@archlinux-es.org>
@@ -8,21 +7,20 @@
 # Contributor: delor <bartekpiech gmail com>
 
 # ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
-#  - patch distributed botan version for ARM
 #  - drop valgrind optdepend
 
 buildarch=12
 
 pkgname=qtcreator
-pkgver=4.5.2
-_clangver=5.0.1
+pkgver=4.7.1
+_clangver=6.0.1
 pkgrel=1
 pkgdesc='Lightweight, cross-platform integrated development environment'
 arch=(x86_64)
 url='http://qt-project.org'
 license=(LGPL)
-depends=(qt5-tools qt5-quickcontrols qt5-quickcontrols2 qt5-webengine clang=$_clangver qbs)
-makedepends=(git mesa llvm)
+depends=(qt5-tools qt5-quickcontrols qt5-quickcontrols2 qt5-webengine clang=$_clangver qbs clazy)
+makedepends=(git mesa llvm python)
 options=(docs)
 optdepends=('qt5-doc: integrated Qt documentation'
             'qt5-examples: welcome page examples'
@@ -34,27 +32,29 @@ optdepends=('qt5-doc: integrated Qt documentation'
             'mercurial: mercurial support'
             'bzr: bazaar support')
 source=("http://download.qt.io/official_releases/qtcreator/${pkgver%.*}/$pkgver/qt-creator-opensource-src-$pkgver.tar.xz"
-        '0001-Fix-Allow-qt-creator-to-build-on-arm-aarch32-and-aar.patch')
-sha256sums=('32fe9ffbb170d0461f6b010dcb0db4dd73c3b27cc575c760958507929975693a'
-            '56e6876f41ee8909ee197f7ab5a2bb18ad5a7fe26ce490a48cdf062fa199ffc6')
+        qtcreator-clang-plugins.patch)
+sha256sums=('c98254336953f637015f14b8b4ddb5e274454a5416fd20dd09747a6e50762565'
+            '6f19fc9d83964a5460d224b3d44ce580553847960181fe0364e2ce26e1efd2e6')
 
 prepare() {
   mkdir -p build
 
+  cd qt-creator-opensource-src-$pkgver
   # fix hardcoded libexec path
-  sed -e 's|libexec\/qtcreator|lib\/qtcreator|g' -i qt-creator-opensource-src-${pkgver}/qtcreator.pri
+  sed -e 's|libexec\/qtcreator|lib\/qtcreator|g' -i qtcreator.pri
   # use system qbs
-  rm -r qt-creator-opensource-src-${pkgver}/src/shared/qbs
-
-  cd qt-creator-opensource-src-${pkgver}
-  git apply ../0001-Fix-Allow-qt-creator-to-build-on-arm-aarch32-and-aar.patch
+  rm -r src/shared/qbs
+  # Load analyzer plugins on demand, since upstream clang doesn't link to all plugins
+  # see http://code.qt.io/cgit/clang/clang.git/commit/?id=7f349701d3ea0c47be3a43e265699dddd3fd55cf
+  # and https://bugs.archlinux.org/task/59492
+  patch -p1 -i ../qtcreator-clang-plugins.patch
 }
 
 build() {
   cd build
 
   qmake LLVM_INSTALL_DIR=/usr QBS_INSTALL_DIR=/usr CONFIG+=journald QMAKE_CFLAGS_ISYSTEM=-I \
-    DEFINES+=QBS_ENABLE_PROJECT_FILE_UPDATES "$srcdir"/qt-creator-opensource-src-${pkgver}/qtcreator.pro
+    DEFINES+=QBS_ENABLE_PROJECT_FILE_UPDATES "$srcdir"/qt-creator-opensource-src-$pkgver/qtcreator.pro
   make
   make docs
 }

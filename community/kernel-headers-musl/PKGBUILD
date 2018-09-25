@@ -4,18 +4,18 @@
 #  - ensure ARCH is defined as "arm" for v6 and v7
 
 pkgname=kernel-headers-musl
-pkgver=3.12.6_5
-pkgrel=1.1
+pkgver=3.12.6_6
+pkgrel=1
 pkgdesc="Linux kernel headers sanitized for use with musl libc"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="https://github.com/sabotage-linux/kernel-headers"
 license=('LGPL')
 depends=('musl')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/sabotage-linux/kernel-headers/archive/v${pkgver/_/-}.tar.gz")
-md5sums=('2fe2d8053716759e42f182fbc75424e8')
+sha512sums=('866f01e5fc3f03eb191c0ce8e8a021b21d57bf5b38bdaf0fc75629f17409817358916177f48a90192dcd2678fc1ed3c917f1176ea3bd42b1ccfffe1a7eb2f8ba')
 
 build() {
-  cd $srcdir/kernel-headers-${pkgver/_/-}
+  cd "$srcdir"/kernel-headers-${pkgver/_/-}
   _CARCH=$CARCH
   [ $CARCH == "i686" ] && _CARCH=x86
   [ $CARCH == "armv7h" -o $CARCH == "armv6h" ] && _CARCH=arm
@@ -23,9 +23,9 @@ build() {
 }
 
 package() {
-  cd $srcdir/kernel-headers-${pkgver/_/-}
+  cd "$srcdir"/kernel-headers-${pkgver/_/-}
   _CARCH=$CARCH
   [ $CARCH == "i686" ] && _CARCH=x86
   [ $CARCH == "armv7h" -o $CARCH == "armv6h" ] && _CARCH=arm
-  make ARCH=${_CARCH} prefix=/usr/lib/musl DESTDIR=$pkgdir install
+  make ARCH=${_CARCH} prefix=/usr/lib/musl DESTDIR="$pkgdir" install
 }

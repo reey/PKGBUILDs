@@ -6,7 +6,7 @@
 #  - cmake with -DENABLE_32BIT_GLINJECT="FALSE" -DENABLE_X86_ASM="FALSE" -DWITH_GLINJECT="FALSE"
 
 pkgname=simplescreenrecorder
-pkgver=0.3.10
+pkgver=0.3.11
 pkgrel=1
 pkgdesc="A feature-rich screen recorder that supports X11 and OpenGL."
 arch=("x86_64")

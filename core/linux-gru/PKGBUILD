@@ -6,9 +6,9 @@ buildarch=8
 pkgbase=linux-gru
 _kernelname=${pkgbase#linux}
 _desc="Gru Chromebooks"
-pkgver=4.4.121
+pkgver=4.4.156
 pkgrel=1
-_commit=df4c8f8f196224dd8c436efc861a7a03d5211df6
+_commit=4c1c006cfa1dbd9225506f4ad0024845881158af
 arch=('aarch64')
 url="https://chromium.googlesource.com/chromiumos/third_party/kernel/+/chromeos-4.4"
 license=('GPL2')
@@ -22,11 +22,11 @@ source=("https://chromium.googlesource.com/chromiumos/third_party/kernel/+archiv
         'kernel.its'
         'kernel.keyblock'
         'kernel_data_key.vbprivk')
-md5sums=('82a96cf91e62e322cc546aba74e462dc'
+md5sums=('acc5462747a02fd3b66478580a7b0156'
          'd3b3d9d59f91cc6fad24c29873ad87bc'
          '66cd7c64f8861025fa8e394675222aa1'
          '8f416793377fc69914851a32fe6ca33e'
-         '1059e9a5d59c49cb6de69c5702401a41'
+         '00846609c7a29728f78d52140b67c566'
          '51896870709e97c4f131e99c33ff115d'
          '61c5ff73c136ed07a7aadbf58db3d96a'
          '584777ae88bce2c5659960151b64c7d8')
@@ -244,7 +244,7 @@ _package-headers() {
   done
 
   # remove unneeded architectures
-  rm -rf "${pkgdir}"/usr/lib/modules/${_kernver}/build/arch/{alpha,arc,arm,arm26,avr32,blackfin,c6x,cris,frv,h8300,hexagon,ia64,m32r,m68k,m68knommu,metag,mips,microblaze,mn10300,openrisc,parisc,powerpc,ppc,s390,score,sh,sh64,sparc,sparc64,tile,unicore32,um,v850,x86,xtensa}
+  rm -rf "${pkgdir}"/usr/lib/modules/${_kernver}/build/arch/{alpha,arc,arm26,avr32,blackfin,c6x,cris,frv,h8300,hexagon,ia64,m32r,m68k,m68knommu,metag,mips,microblaze,mn10300,openrisc,parisc,powerpc,ppc,s390,score,sh,sh64,sparc,sparc64,tile,unicore32,um,v850,x86,xtensa}
 }
 
 pkgname=("${pkgbase}" "${pkgbase}-headers")

@@ -3,9 +3,9 @@
 
 buildarch=4
 
-_rcver=4.16
+_rcver=4.19
 _rcrel=5
-_rcnrel=armv7-x0
+_rcnrel=armv7-x1
 
 pkgbase=linux-armv7-rc
 _srcname=linux-${_rcver}-rc${_rcrel}
@@ -27,36 +27,36 @@ source=("https://git.kernel.org/torvalds/t/${_srcname}.tar.gz"
         '0005-net-smsc95xx-Allow-mac-address-to-be-set-as-a-parame.patch'
         '0006-set-default-cubietruck-led-triggers.patch'
         '0007-exynos4412-odroid-set-higher-minimum-buck2-regulator.patch'
-        '0008-disable-USB3-port-on-ODROID-XU.patch'
-        '0009-ARM-dove-enable-ethernet-on-D3Plug.patch'
-        '0010-power-add-power-sequence-library.patch'
-        '0011-usb-core-add-power-sequence-handling-for-USB-devices.patch'
-        '0012-ARM-dts-imx6qdl-Enable-usb-node-children-with-reg.patch'
-        '0013-ARM-dts-imx6qdl-udoo.dtsi-fix-onboard-USB-HUB-proper.patch'
-        '0014-ARM-dts-imx6q-evi-Fix-onboard-hub-reset-line.patch'
+        '0008-ARM-dove-enable-ethernet-on-D3Plug.patch'
+        '0009-power-add-power-sequence-library.patch'
+        '0010-usb-core-add-power-sequence-handling-for-USB-devices.patch'
+        '0011-ARM-dts-imx6qdl-Enable-usb-node-children-with-reg.patch'
+        '0012-ARM-dts-imx6qdl-udoo.dtsi-fix-onboard-USB-HUB-proper.patch'
+        '0013-ARM-dts-imx6q-evi-Fix-onboard-hub-reset-line.patch'
+        '0014-usb-dwc2-disable-power_down-on-rockchip-devices.patch'
         'config'
         'kernel.its'
         'kernel.keyblock'
         'kernel_data_key.vbprivk'
         'linux.preset'
         '99-linux.hook')
-md5sums=('2ca30f78f9bb36ef7999d64748671a96'
-         '22b8634a5615366f0e7b984e8edd206a'
-         'a5cc265aa1828fa0c1bc232e120840c1'
-         '77406a7abd87c218e1f56936c89081b6'
-         '378bfcee7a20b4197151431ed3bb68f3'
-         'e077ad92226ccabee1d6ff269477714d'
-         '725c5979f93698370901fed2d98844b3'
-         'de18b694f5e66fffafb126aeb54430aa'
-         'a9e89dba6435e61a18fd31628f0f6c54'
-         '66d29d01e77052bd73bc2afdb2ec67b3'
-         'c47442cdd494a931f63c0d243a114c90'
-         '9e56e2d9aa0f9dc3335529a36e8e5a31'
-         '4ac71ad4e96bbf59126c14f490039864'
-         'b5294786095a75de4cc6ec4aed12d96e'
-         '6e35fc341ed114fbe785ec204cec9525'
-         '3293d4da6b2629f9ebb9738c56ccba08'
-         'f45ffbfe89218af75d8fbed1f920fe16'
+md5sums=('5a3109e96d992abf0771de7327a412b5'
+         'b83ff4d0bb7b9bcb52bbec06a38504b4'
+         'b12466afb3d0b5265e4f3eb286197be7'
+         '256bbae12b94f732f69cca9297ff96de'
+         '3b1720b2334c4efb16e0da002734a00e'
+         '7ccb756e46aa9a61a2ffdf0549f0edc3'
+         'fcbf4fef50ca6cbd2b360a3603cde764'
+         '6f5d1259ca3c23ed24c8c23f7a9af93f'
+         'fc30a0f23a9f185baf3bd02cb55609b4'
+         '4169c9ea2f1f0511fd242df1021fadfc'
+         '2028de0c679e6926a311d6805d767824'
+         'f868d4a5d828f56e018a7c28256081bd'
+         '1d400b52890fb0d08911e4a4b25bfec5'
+         '18ebf11f2ad87660c62eea3c49258efa'
+         'c7652c4ef9ef6f5204cff75ee2304ad8'
+         'd90174a3bcbf777d907413b92b7ad1b6'
+         'e919f9d0b5184bb61e2dc405efb4bac5'
          '4f2379ed84258050edb858ee8d281678'
          '61c5ff73c136ed07a7aadbf58db3d96a'
          '584777ae88bce2c5659960151b64c7d8'
@@ -78,13 +78,13 @@ prepare() {
   git apply ../0005-net-smsc95xx-Allow-mac-address-to-be-set-as-a-parame.patch
   git apply ../0006-set-default-cubietruck-led-triggers.patch
   git apply ../0007-exynos4412-odroid-set-higher-minimum-buck2-regulator.patch
-  git apply ../0008-disable-USB3-port-on-ODROID-XU.patch
-  git apply ../0009-ARM-dove-enable-ethernet-on-D3Plug.patch
-  git apply ../0010-power-add-power-sequence-library.patch
-  git apply ../0011-usb-core-add-power-sequence-handling-for-USB-devices.patch
-  git apply ../0012-ARM-dts-imx6qdl-Enable-usb-node-children-with-reg.patch
-  git apply ../0013-ARM-dts-imx6qdl-udoo.dtsi-fix-onboard-USB-HUB-proper.patch
-  git apply ../0014-ARM-dts-imx6q-evi-Fix-onboard-hub-reset-line.patch
+  git apply ../0008-ARM-dove-enable-ethernet-on-D3Plug.patch
+  git apply ../0009-power-add-power-sequence-library.patch
+  git apply ../0010-usb-core-add-power-sequence-handling-for-USB-devices.patch
+  git apply ../0011-ARM-dts-imx6qdl-Enable-usb-node-children-with-reg.patch
+  git apply ../0012-ARM-dts-imx6qdl-udoo.dtsi-fix-onboard-USB-HUB-proper.patch
+  git apply ../0013-ARM-dts-imx6q-evi-Fix-onboard-hub-reset-line.patch
+  git apply ../0014-usb-dwc2-disable-power_down-on-rockchip-devices.patch
 
   cat "${srcdir}/config" > ./.config
 
@@ -302,7 +302,7 @@ _package-smileplug() {
   pkgdesc="The Linux Kernel - ${_desc} - Marvell SMILE Plug"
   depends=('linux-armv7-rc')
   provides=('linux-armv7-rc-uimage')
-  conflicts=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
 
   cd "${srcdir}/${_srcname}"
 
@@ -315,7 +315,7 @@ _package-mirabox() {
   pkgdesc="The Linux Kernel - ${_desc} - Globalscale Mirabox"
   depends=('linux-armv7-rc')
   provides=('linux-armv7-rc-uimage')
-  conflicts=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
 
   cd "${srcdir}/${_srcname}"
 
@@ -328,7 +328,7 @@ _package-ax3() {
   pkgdesc="The Linux Kernel - ${_desc} - OpenBlocks AX3-4"
   depends=('linux-armv7-rc')
   provides=('linux-armv7-rc-uimage')
-  conflicts=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
 
   cd "${srcdir}/${_srcname}"
 
@@ -341,7 +341,7 @@ _package-d3plug() {
   pkgdesc="The Linux Kernel - ${_desc} - Globalscale D3Plug"
   depends=('linux-armv7-rc')
   provides=('linux-armv7-rc-uimage')
-  conflicts=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
 
   cd "${srcdir}/${_srcname}"
 
@@ -350,9 +350,23 @@ _package-d3plug() {
   mkimage -A arm -O linux -T kernel -C none -a 0x00008000 -e 0x00008000 -n "${pkgname}" -d myimage "${pkgdir}/boot/uImage"
 }
 
+_package-cubox() {
+  pkgdesc="The Linux Kernel - ${_desc} - SolidRun Cubox (Marvell)"
+  depends=('linux-armv7-rc')
+  provides=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
+
+  cd "${srcdir}/${_srcname}"
+
+  mkdir -p "${pkgdir}/boot"
+  cat arch/$KARCH/boot/zImage arch/$KARCH/boot/dts/dove-cubox.dtb > myimage
+  mkimage -A arm -O linux -T kernel -C none -a 0x00008000 -e 0x00008000 -n "${pkgname}" -d myimage "${pkgdir}/boot/uImage"
+}
+
 _package-chromebook() {
   pkgdesc="The Linux Kernel - ${_desc} - Chromebooks"
   depends=('linux-armv7-rc')
+  conflicts=('linux-armv7-chromebook')
   install=${pkgname}.install
 
   cd "${srcdir}/${_srcname}"
@@ -375,7 +389,19 @@ _package-chromebook() {
   cp vmlinux.kpart "${pkgdir}/boot"
 }
 
-pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-smileplug" "${pkgbase}-mirabox" "${pkgbase}-ax3" "${pkgbase}-d3plug" "${pkgbase}-chromebook")
+_package-odroidc1() {
+  pkgdesc="The Linux Kernel - ${_desc} - ODROID-C1"
+  depends=('linux-armv7-rc')
+  provides=('linux-armv7-rc-uimage')
+  conflicts=('linux-armv7-rc-uimage' 'linux-armv7-uimage')
+
+  cd "${srcdir}/${_srcname}"
+
+  mkdir -p "${pkgdir}/boot"
+  mkimage -A arm -O linux -T kernel -C none -a 0x00208000 -e 0x00208000 -n "${pkgname}" -d arch/$KARCH/boot/zImage "${pkgdir}/boot/uImage"
+}
+
+pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-smileplug" "${pkgbase}-mirabox" "${pkgbase}-ax3" "${pkgbase}-d3plug" "${pkgbase}-cubox" "${pkgbase}-chromebook" "${pkgbase}-odroidc1")
 for _p in ${pkgname[@]}; do
   eval "package_${_p}() {
     _package${_p#${pkgbase}}

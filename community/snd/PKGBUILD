@@ -1,6 +1,6 @@
 # $Id$
 # Maintainer: David Runge <dave@sleepmap.de>
-# Maintainer: Ray Rashif <schiv@archlinux.org>
+# Contributor: Ray Rashif <schiv@archlinux.org>
 # Contributor: Juergen Hoetzel <juergen@archlinux.org>
 # Contributor: see .contrib
 
@@ -8,12 +8,13 @@
 #  - build with pulseaudio as sound server, not jack (x86 asm)
 
 pkgname=snd
-pkgver=18.1
+pkgver=18.7
 pkgrel=1
 pkgdesc="An advanced sound editor"
 arch=('x86_64')
 url="https://ccrma.stanford.edu/software/snd/"
 license=('custom:free')
+groups=('pro-audio')
 depends=('pulseaudio' 'fftw' 'gsl' 'gtk3' 'libmpc' 'ruby')
 makedepends=('flac' 'gmp' 'glu' 'ladspa' 'libpulse' 'libxpm' 'mpg123'
 'openmotif' 'speex' 'timidity++' 'vorbis-tools' 'wavpack')
@@ -24,7 +25,7 @@ optdepends=('wavpack: For wav support'
             'timidity++: For MIDI to WAVE support'
             'vorbis-tools: For OGG support')
 source=("https://sourceforge.net/projects/${pkgname}/files/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-sha512sums=('4843e64a34a531c3d95ad6f9ff65a15c5698631e028bae4aa193bb85f0039b740568d00fd23eea29e0dce1906113dc948f8751b7c443814bc5d51f88c8c182a2')
+sha512sums=('18d17fa1049c142657989fcc8b2d1aef9e45a1e373b66ac6878de3056835728f41cfd0de4f33fff461044238d9b7e5c8be0bf4702d339702bb1df2157f80bcd1')
 
 build() {
   cd "${pkgname}-${pkgver}"
@@ -42,11 +43,10 @@ build() {
 package() {
   cd "${pkgname}-${pkgver}"
   make prefix="${pkgdir}/usr" install
-  install -vDm644 COPYING \
-    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -vDm644 HISTORY.Snd  "${pkgdir}/usr/share/doc/${pkgname}/HISTORY"
-  install -vDm644 NEWS "${pkgdir}/usr/share/doc/${pkgname}/NEWS"
-  install -vDm644 README.Snd  "${pkgdir}/usr/share/doc/${pkgname}/README"
+  install -vDm 644 COPYING "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -vDm 644 HISTORY.Snd  "${pkgdir}/usr/share/doc/${pkgname}/HISTORY"
+  install -vDm 644 NEWS "${pkgdir}/usr/share/doc/${pkgname}/NEWS"
+  install -vDm 644 README.Snd  "${pkgdir}/usr/share/doc/${pkgname}/README"
 }
 
 # vim:set ts=2 sw=2 et:

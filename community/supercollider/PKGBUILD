@@ -1,4 +1,3 @@
-# $Id$
 # Maintainer: David Runge <dave@sleepmap.de>
 # Contributor: speps <speps at aur dot archlinux dot org>
 # Contributor: osc <farid at archlinux-br.org>
@@ -8,35 +7,32 @@
 
 _name=SuperCollider
 pkgname=supercollider
-pkgver=3.9.1
-pkgrel=3
-pkgdesc="An environment and programming language for real time audio synthesis and algorithmic composition"
+pkgver=3.9.3
+pkgrel=4
+pkgdesc="Environment and programming language for real time audio synthesis and algorithmic composition"
 arch=('x86_64')
 url="https://supercollider.github.io"
 license=('GPL3')
+groups=('pro-audio')
 depends=('boost-libs' 'fftw' 'jack' 'qt5-webkit' 'yaml-cpp')
 makedepends=('boost' 'cmake' 'emacs' 'qt5-tools')
 optdepends=('emacs: emacs interface'
-            'gedit: gedit interface')
+            'gedit: gedit interface'
+            'sc3-plugins: additional extension plugins for scsynth')
 source=("https://github.com/${pkgname}/${pkgname}/releases/download/Version-${pkgver}/${_name}-${pkgver}-Source-linux.tar.bz2"
-        '0001-cmake-correctly-include-yaml-cpp.patch'
-        '0002-set-YAMLCPP_LIBRARY-and-YAMLCPP_INCLUDE_DIR-if-not-u.patch'
-        )
+        'boost-1.67.patch')
 install="${pkgname}.install"
-sha512sums=('01652f61498c84bf1b7c18ebe091794539d8f9cbb2112a04d0cb9d8b2e7f226d9876cffc76f6fa5519528c243c3ccc1380ace3bef5d70ff85e2bf32337b3d483'
-            'd4204b8c8ce12b383b39f96e9a9f36ee71a36ddfba019cdf0454ffa8170681bd38b688e41c6e5910f087ad13b3021f59dc2c0c825a500c57364b04fb5d90af30'
-            'be587ee652c652f2a19a68d06ca62cae5c5f6c5d4d3a5777723e1aba319e859ede418010345b7a4b0fe8d02dc70528fec7f4479dce259914f2d57d46d9ad659f')
+sha512sums=('5b0c29941907d5ca45c1676e34184664c03891051bba0ee50d9e8311400824054de7b6daba6d29fd875ff38f42ee9654504ea2f0b5bf0a36ae9605e6a79a0841'
+            '9980d77802f18fd56d2a13f24f070e81768d9111b2cc63e479a0e9b405a04aec28bc523e5d36aab0462af6a3831d64598470cdc6c3266431e2ca64aa427a6bf2')
 
 prepare() {
   mv -v "${_name}-Source" "${pkgname}-${pkgver}"
   cd "${pkgname}-${pkgver}"
-  # fixing yaml-cpp include:
-  # https://github.com/supercollider/supercollider/issues/3557
-  patch -Np1 -i ../0001-cmake-correctly-include-yaml-cpp.patch
-  patch -Np1 -i \
-    ../0002-set-YAMLCPP_LIBRARY-and-YAMLCPP_INCLUDE_DIR-if-not-u.patch
+  patch -Np1 -i ../boost-1.67.patch
   # requires out-of-tree build
   mkdir -v bld
+  # make sure the system boost headers are used
+  rm -r external_libraries/boost
 }
 
 build() {
@@ -57,5 +53,5 @@ package() {
   cd "${pkgname}-${pkgver}/bld"
   make DESTDIR="${pkgdir}" install
   install -t "${pkgdir}/usr/share/doc/${pkgname}/" \
-    -vDm644 ../{AUTHORS,{CHANGELOG,README,README_LINUX}.md}
+    -vDm 644 ../{AUTHORS,{CHANGELOG,README,README_LINUX}.md}
 }

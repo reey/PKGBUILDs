@@ -5,21 +5,36 @@ buildarch=8
 
 pkgname=xf86-video-armsoc-meson
 pkgver=0.5
-pkgrel=1
+pkgrel=4
 pkgdesc="X.org Mali video driver for Meson platforms"
 arch=('aarch64')
 license=('MIT')
 url="https://github.com/jakogut/xf86-video-armsoc.git"
 depends=('mali-utgard-meson-libgl-x11')
-makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=23' 'git')
-conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<23' 'X-ABI-VIDEODRV_VERSION>=24')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=24.0' 'git')
+conflicts=('xorg-server<1.20' 'X-ABI-VIDEODRV_VERSION<24' 'X-ABI-VIDEODRV_VERSION>=25')
 source=($pkgname::"git+${url}"
-	99-mali-meson.conf)
+        0001-Initialize-XRandR-before-EnterVT.patch
+        99-mali-meson.conf)
 sha256sums=('SKIP'
+            'a8abfb29efec9ba2c9a80a1c1fb68659c96b46b0b5a9a5f5cfbe691f0fdbf1fc'
             'eca6ed5e20457d41a0fc9ac07034ee2682d5623cf6e566bf9df017d217540952')
+
+prepare() {
+  cd $pkgname
+  git apply ../0001-Initialize-XRandR-before-EnterVT.patch
+}
 
 build() {
   cd $pkgname
+
+  # Since pacman 5.0.2-2, hardened flags are now enabled in makepkg.conf
+  # With them, module fail to load with undefined symbol.
+  # See https://bugs.archlinux.org/task/55102 / https://bugs.archlinux.org/task/54845
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/,-z,now}
+
   LDFLAGS+=" -L/usr/lib/mali-egl"
   ./autogen.sh --prefix=/usr
   make

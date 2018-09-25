@@ -13,7 +13,7 @@
 #  - remove --enable-aesni from configure
 
 pkgname=strongswan
-pkgver=5.6.2
+pkgver=5.7.0
 pkgrel=1
 pkgdesc="open source IPsec implementation"
 url='http://www.strongswan.org'
@@ -50,7 +50,7 @@ source=("https://download.strongswan.org/strongswan-${pkgver}.tar.bz2"
 
 validpgpkeys=("948F158A4E76A27BF3D07532DF42C170B34DBA77")
 
-sha512sums=('cf2d5cb6c45d991fe0ad8eed4ea8628f95a1871e9728ddf0985aa26e78d1e6da1c92c961772aafd3e55cfcfa84516204a15561389d373f78140f05607b248c52'
+sha512sums=('811bfa79aa2b17fcf298c45a2b4109cf4235286e90c4def3e09022ed94c7fa481fc25b8d5054529e4ff4e33011ce6f6ba9874595d16c1a8fe13ef924c4ec6395'
             'SKIP'
             '0e2c818f2f620410dda949d9016a4c1a686bf2946acb3b42a729b2376c077f4dad6762fe8d2f736c213c4895c1fbd60c0d654a1c36f72d06f58ba7cff635bc74')
 
@@ -74,6 +74,7 @@ build() {
         --with-nm-ca-dir=/etc/ssl/certs \
         --enable-integrity-test \
         --enable-sqlite \
+        --enable-pkcs11 \
         --enable-openssl --enable-curl \
         --enable-sql --enable-attr-sql \
         --enable-farp --enable-dhcp \

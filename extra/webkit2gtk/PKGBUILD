@@ -1,47 +1,35 @@
-# $Id$
+# Maintainer: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
 # Contributor: Eric Bélanger <eric@archlinux.org>
 
 # ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
 #  - do not use LLINT assembly for v5/v6
-#  - remove Atomics.cpp from build for v5/v6 - https://bugs.webkit.org/show_bug.cgi?id=161900
 
 highmem=1
 
 pkgname=webkit2gtk
-pkgver=2.18.6
+pkgver=2.22.2
 pkgrel=1
 pkgdesc="GTK+ Web content engine library"
 arch=(x86_64)
 url="https://webkitgtk.org/"
 license=(custom)
-depends=(libxt libxslt enchant geoclue2 gst-plugins-base-libs gst-plugins-bad
-         libsecret libwebp harfbuzz-icu gtk3 libnotify hyphen)
+depends=(libxt libxslt enchant geoclue2 gst-plugins-base-libs
+         libsecret libwebp harfbuzz-icu gtk3 libnotify hyphen woff2)
 makedepends=(gtk2 gperf gobject-introspection ruby gtk-doc cmake python python2 ninja)
 optdepends=('gtk2: Netscape plugin support'
             'gst-plugins-base: free media decoding'
             'gst-plugins-good: media decoding'
             'gst-libav: nonfree media decoding')
-source=(https://webkitgtk.org/releases/webkitgtk-${pkgver}.tar.xz{,.asc}
-        enchant-2.diff
-        remove_atomics.patch)
-sha256sums=('93912cc2f40f12e452be1ca4babdbdaac0ec4f828d441257a6b06c2963bbac3c'
-            'SKIP'
-            'ed8e5fe614ed800da3caccb8162bdd2d8dbd5a69ab90d426b34e124dee5cf1b6'
-            '410449817b1b181737538be10d96d6d8aec134285f6288e80c96fbfdd5d19519')
-validpgpkeys=('D7FCF61CF9A2DEAB31D81BD3F3D322D0EC4582C3')
+source=(https://webkitgtk.org/releases/webkitgtk-${pkgver}.tar.xz{,.asc})
+sha256sums=('345487d4d1896e711683f951d1e09387d3b90d7cf59295c0e634af7f515e99ba'
+            'SKIP')
+validpgpkeys=('D7FCF61CF9A2DEAB31D81BD3F3D322D0EC4582C3'
+              '5AA3BC334FD7E3369E7C77B291C559DBE4C9123B')
 
 prepare() {
   mkdir build
   cd webkitgtk-$pkgver
-
-  # enchant 2.2
-  patch -Np1 -i ../enchant-2.diff
-
   sed -i '1s/python$/&2/' Tools/gtk/generate-gtkdoc
-
-  if [[ $CARCH == "arm" || $CARCH == "armv6h" ]]; then
-    patch -p0 -i ../remove_atomics.patch
-  fi
 }
 
 build() {
@@ -50,8 +38,7 @@ build() {
   # do not use LLINT assembly for v5/v6
   [[ $CARCH == "arm" || $CARCH == "armv6h" ]] && CONFIG="-DENABLE_JIT=OFF"
 
-  cmake \
-    -G Ninja \
+  cmake ../webkitgtk-$pkgver -G Ninja \
     -DPORT=GTK \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -60,19 +47,25 @@ build() {
     -DLIBEXEC_INSTALL_DIR=/usr/lib \
     -DLIB_INSTALL_DIR=/usr/lib \
     -DPYTHON_EXECUTABLE=/usr/bin/python2 \
-    $CONFIG ../webkitgtk-$pkgver
-  ninja
+    $CONFIG
+  cmake --build .
+}
+
+check() {
+  : cmake --build build --target tests
 }
 
 package() {
-  cd build
-  DESTDIR="$pkgdir" ninja install
+  DESTDIR="$pkgdir" cmake --build build --target install
 
-  cd ../webkitgtk-$pkgver
-  find Source -name 'COPYING*' -or -name 'LICENSE*' -print0 | while IFS= read -d $'\0' -r _f
-  do
-    echo "### $_f ###"
-    cat "$_f"
-    echo
-  done | install -Dm644 /dev/stdin "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  cd webkitgtk-$pkgver
+  find Source -name 'COPYING*' -or -name 'LICENSE*' -print0 | sort -z |
+    while IFS= read -d $'\0' -r _f; do
+      echo "### $_f ###"
+      cat "$_f"
+      echo
+    done |
+    install -Dm644 /dev/stdin "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
+
+# vim:set sw=2 et:
