@@ -32,7 +32,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
         'kernel.keyblock'
         'kernel_data_key.vbprivk'
         'linux.preset'
-        '99-linux.hook')
+        '99-linux.hook'
+        'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch')
 md5sums=('bee5fe53ee1c3142b8f0c12c0d3348f9'
          '66d2396d0abc987979c8b06426e9a1d3'
          '66d70faf3c34dbd5a446006397f4c49b'
@@ -45,12 +46,13 @@ md5sums=('bee5fe53ee1c3142b8f0c12c0d3348f9'
          '3a081129e684856956aa34d923af4688'
          'd2210b9d9f6351082aac5a5af7456e9b'
          '0d793bd695360e3f978a21843d0651cb'
-         'f1a068e6dd3ea2389877d3857ea493f0'
+         'SKIP'
          '4f2379ed84258050edb858ee8d281678'
          '61c5ff73c136ed07a7aadbf58db3d96a'
          '584777ae88bce2c5659960151b64c7d8'
          'fb034fe5f2e28a4cce30ae2d8cf6be3c'
-         '79fa396e3f9a09a85156d6d7c2d34b58')
+         '79fa396e3f9a09a85156d6d7c2d34b58'
+         'SKIP')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
@@ -72,6 +74,7 @@ prepare() {
   git apply ../0008-ARM-dove-enable-ethernet-on-D3Plug.patch
   git apply ../0009-usb-dwc2-disable-power_down-on-rockchip-devices.patch
 
+  patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
   cat "${srcdir}/config" > ./.config
 
   # add pkgrel to extraversion
@@ -392,7 +395,7 @@ _package-odroidc1() {
   mkimage -A arm -O linux -T kernel -C none -a 0x00208000 -e 0x00208000 -n "${pkgname}" -d arch/$KARCH/boot/zImage "${pkgdir}/boot/uImage"
 }
 
-pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-smileplug" "${pkgbase}-mirabox" "${pkgbase}-ax3" "${pkgbase}-d3plug" "${pkgbase}-cubox" "${pkgbase}-chromebook" "${pkgbase}-odroidc1")
+pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-chromebook")
 for _p in ${pkgname[@]}; do
   eval "package_${_p}() {
     _package${_p#${pkgbase}}
