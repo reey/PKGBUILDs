@@ -1,7 +1,7 @@
-From 3379ffad8f5b3db47578cc4eadc3c0f22f7547f1 Mon Sep 17 00:00:00 2001
+From fa043c693efab65d3caa02cbaf93813531040eb1 Mon Sep 17 00:00:00 2001
 From: Hal Emmerich <hal@halemmerich.com>
 Date: Thu, 19 Jul 2018 21:48:08 -0500
-Subject: [PATCH 9/9] usb: dwc2: disable power_down on rockchip devices
+Subject: [PATCH 5/5] usb: dwc2: disable power_down on rockchip devices
 
  The bug would let the usb controller enter partial power down,
  which was formally known as hibernate, upon boot if nothing was plugged
