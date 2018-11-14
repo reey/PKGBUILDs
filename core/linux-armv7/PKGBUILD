@@ -7,16 +7,16 @@ pkgbase=linux-armv7
 _srcname=linux-4.19
 _kernelname=${pkgbase#linux}
 _desc="ARMv7 multi-platform"
-pkgver=4.19.0
+pkgver=4.19.1
 pkgrel=1
-rcnrel=armv7-x3
+rcnrel=armv7-x5
 arch=('armv7h')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'uboot-tools' 'vboot-utils' 'dtc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
-        #"http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         "http://rcn-ee.com/deb/sid-armhf/v${pkgver}-${rcnrel}/patch-${pkgver%.0}-${rcnrel}.diff.gz"
         '0001-ARM-atags-add-support-for-Marvell-s-u-boot.patch'
         '0002-ARM-atags-fdt-retrieve-MAC-addresses-from-Marvell-bo.patch'
@@ -32,10 +32,10 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
         'kernel.keyblock'
         'kernel_data_key.vbprivk'
         'linux.preset'
-        '99-linux.hook'
-	'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch')
+        '99-linux.hook')
 md5sums=('740a90cf810c2105df8ee12e5d0bb900'
-         'c36273de258b349d35a8c64bbb047660'
+         '8d5da563baab055b8d76c94f5040948a'
+         '3a012ff92f1cea19fce6c1e70ceb51e4'
          'acbef669729b6d1714eae635e3fc5cb0'
          '592521ffbad728eb5b6bd6cbfb2f7483'
          'b75039abcd5c8d040ff16b3f95586827'
@@ -45,35 +45,32 @@ md5sums=('740a90cf810c2105df8ee12e5d0bb900'
          '08dc5f1eda02cffa65842b5610ba8cb8'
          '07232ec1318aab8d53a16e3a99af50a7'
          '579a311a4be75313e778c9b04fa95f52'
-         'SKIP'
+         '698a7440008cbe2395f694a84dbed578'
          '4f2379ed84258050edb858ee8d281678'
          '61c5ff73c136ed07a7aadbf58db3d96a'
          '584777ae88bce2c5659960151b64c7d8'
          'fb034fe5f2e28a4cce30ae2d8cf6be3c'
-         '79fa396e3f9a09a85156d6d7c2d34b58'
-	 'SKIP')
+         '79fa396e3f9a09a85156d6d7c2d34b58')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
 
   # add upstream patch
-  #git apply --whitespace=nowarn ../patch-${pkgver}
+  git apply --whitespace=nowarn ../patch-${pkgver}
 
   # RCN patch
   git apply ../patch-${pkgver%.0}-${rcnrel}.diff
 
   # ALARM patches
-#  git apply ../0001-ARM-atags-add-support-for-Marvell-s-u-boot.patch
-#  git apply ../0002-ARM-atags-fdt-retrieve-MAC-addresses-from-Marvell-bo.patch
-#  git apply ../0003-SMILE-Plug-device-tree-file.patch
-#  git apply ../0004-fix-mvsdio-eMMC-timing.patch
-#  git apply ../0005-net-smsc95xx-Allow-mac-address-to-be-set-as-a-parame.patch
-#  git apply ../0006-set-default-cubietruck-led-triggers.patch
-#  git apply ../0007-exynos4412-odroid-set-higher-minimum-buck2-regulator.patch
-#  git apply ../0008-ARM-dove-enable-ethernet-on-D3Plug.patch
-#  git apply ../0009-usb-dwc2-disable-power_down-on-rockchip-devices.patch
-
-  patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
+  git apply ../0001-ARM-atags-add-support-for-Marvell-s-u-boot.patch
+  git apply ../0002-ARM-atags-fdt-retrieve-MAC-addresses-from-Marvell-bo.patch
+  git apply ../0003-SMILE-Plug-device-tree-file.patch
+  git apply ../0004-fix-mvsdio-eMMC-timing.patch
+  git apply ../0005-net-smsc95xx-Allow-mac-address-to-be-set-as-a-parame.patch
+  git apply ../0006-set-default-cubietruck-led-triggers.patch
+  git apply ../0007-exynos4412-odroid-set-higher-minimum-buck2-regulator.patch
+  git apply ../0008-ARM-dove-enable-ethernet-on-D3Plug.patch
+  git apply ../0009-usb-dwc2-disable-power_down-on-rockchip-devices.patch
 
   cat "${srcdir}/config" > ./.config
 
@@ -395,7 +392,7 @@ _package-odroidc1() {
   mkimage -A arm -O linux -T kernel -C none -a 0x00208000 -e 0x00208000 -n "${pkgname}" -d arch/$KARCH/boot/zImage "${pkgdir}/boot/uImage"
 }
 
-pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-chromebook")
+pkgname=("${pkgbase}" "${pkgbase}-headers" "${pkgbase}-smileplug" "${pkgbase}-mirabox" "${pkgbase}-ax3" "${pkgbase}-d3plug" "${pkgbase}-cubox" "${pkgbase}-chromebook" "${pkgbase}-odroidc1")
 for _p in ${pkgname[@]}; do
   eval "package_${_p}() {
     _package${_p#${pkgbase}}
