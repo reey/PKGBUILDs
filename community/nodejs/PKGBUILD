@@ -14,7 +14,7 @@
 buildarch=28
 
 pkgname=nodejs
-pkgver=11.1.0
+pkgver=11.3.0
 pkgrel=1
 pkgdesc='Evented I/O for V8 javascript'
 arch=('x86_64')
@@ -25,7 +25,7 @@ makedepends=('python2' 'procps-ng')
 optdepends=('npm: nodejs package manager')
 source=("nodejs-$pkgver.tar.gz::https://github.com/nodejs/node/archive/v$pkgver.tar.gz"
         'atomic.patch')
-sha512sums=('ae198124799119fee4585c21121ecfca01ba200b412ee3199faca90b969e0e364fb4364df2b147e6d8f9c7f12ce748fe462b41c569eb1b070473feb396d1704e'
+sha512sums=('0b64c8b2a7140dfa37c67e31f2b7acd565954a10df387eb84e87150880f50c5e0c0ade611901d47306e9b466f1140feb281a466b8762f8d658ecfe18fb31fc9b'
             'b1dd60c8f594fc07d66c0c77ea682555064cfd66a778e02d94b39be471ffc39ed9e57059e2f9e4dfc8434f0bd4cb958bce2e186e249aeeb179b854add5b4d9d6')
 
 prepare() {

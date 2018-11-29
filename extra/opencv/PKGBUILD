@@ -6,25 +6,24 @@
 
 pkgbase=opencv
 pkgname=(opencv opencv-samples)
-pkgver=3.4.3
-pkgrel=5
+pkgver=4.0.0
+pkgrel=4
 pkgdesc="Open Source Computer Vision Library"
 arch=(x86_64)
 license=(BSD)
 url="http://opencv.org/"
 depends=(intel-tbb openexr gst-plugins-base libdc1394 cblas lapack libgphoto2 jasper ffmpeg)
-makedepends=(cmake python-numpy python2-numpy mesa eigen hdf5 lapacke gtk3 vtk glew)
+makedepends=(cmake python-numpy python-setuptools mesa eigen hdf5 lapacke gtk3 vtk glew)
 optdepends=('opencv-samples: samples'
             'gtk3: for the HighGUI module'
             'vtk: for the viz module'
             'hdf5: support for HDF5 format'
             'opencl-icd-loader: For coding with OpenCL'
-            'python-numpy: Python 3 interface'
-            'python2-numpy: Python 2 interface')
+            'python-numpy: Python interface')
 source=("$pkgbase-$pkgver.tar.gz::https://github.com/opencv/opencv/archive/$pkgver.zip"
         "opencv_contrib-$pkgver.tar.gz::https://github.com/opencv/opencv_contrib/archive/$pkgver.tar.gz")
-sha256sums=('37c7d8c3b9807902ad11b9181bbde61dcb3898a78a563130494752f46fe8cc5f'
-            '6dfb51326f3dfeb659128df952edecd45683626a965aa4a8e1e9c970c40fb636')
+sha256sums=('86fd08fc02893e05e2944fa7b0daa7d02643232450f020b475e1b2f24587b99a'
+            '4fb0681414df4baedce6e3f4a01318d6f4fcde6ee14854d761fd4e397a397763')
 
 prepare() {
   mkdir -p build
@@ -33,6 +32,7 @@ prepare() {
 build() {
   cd build
   # cmake's FindLAPACK doesn't add cblas to LAPACK_LIBRARIES, so we need to specify them manually
+  _pythonpath=`python -c "from sysconfig import get_path; print(get_path('platlib'))"`
   cmake ../$pkgname-$pkgver \
     -DWITH_OPENCL=ON \
     -DWITH_OPENGL=ON \
@@ -47,26 +47,31 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DOPENCV_EXTRA_MODULES_PATH="$srcdir/opencv_contrib-$pkgver/modules" \
+    -DOPENCV_SKIP_PYTHON_LOADER=ON \
+    -DOPENCV_PYTHON3_INSTALL_PATH=$_pythonpath \
     -DLAPACK_LIBRARIES="/usr/lib/liblapack.so;/usr/lib/libblas.so;/usr/lib/libcblas.so" \
     -DLAPACK_CBLAS_H="/usr/include/cblas.h" \
-    -DLAPACK_LAPACKE_H="/usr/include/lapacke.h"
+    -DLAPACK_LAPACKE_H="/usr/include/lapacke.h" \
+    -DOPENCV_GENERATE_PKGCONFIG=ON
   make
 }
 
 package_opencv() {
-  options=(staticlibs)
-
   cd build
   make DESTDIR="$pkgdir" install
 
   # install license file
   install -Dm644 "$srcdir"/$pkgname-$pkgver/LICENSE -t "$pkgdir"/usr/share/licenses/$pkgname
 
-  cd "$pkgdir"/usr/share
-
   # separate samples package
-  mv OpenCV/samples "$srcdir/$pkgname-samples"
-  mv OpenCV $pkgname # otherwise folder naming is inconsistent
+  cd "$pkgdir"/usr/share
+  mv opencv4/samples "$srcdir"/$pkgname-samples
+
+  # install missing headers https://github.com/opencv/opencv/issues/13201
+  for _module in imgcodecs videoio photo; do
+    cp -r "$srcdir"/$pkgname-$pkgver/modules/$_module/include/opencv2/$_module/legacy \
+      "$pkgdir"/usr/include/opencv4/opencv2/$_module
+  done
 }
 
 package_opencv-samples() {
