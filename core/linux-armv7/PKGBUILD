@@ -33,7 +33,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
         'kernel_data_key.vbprivk'
         'linux.preset'
         '99-linux.hook'
-        'i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch')
+        'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch')
 md5sums=('740a90cf810c2105df8ee12e5d0bb900'
          'ea743dd69c16c1ba237c0c04437bd766'
          '11aa8c53689557a8f6d6305d7518dec5'
@@ -74,7 +74,8 @@ prepare() {
   git apply ../0008-ARM-dove-enable-ethernet-on-D3Plug.patch
   git apply ../0009-usb-dwc2-disable-power_down-on-rockchip-devices.patch
 
-  git apply ../i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
+  #git apply ../i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
+  patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
   cat "${srcdir}/config" > ./.config
 
   # add pkgrel to extraversion
