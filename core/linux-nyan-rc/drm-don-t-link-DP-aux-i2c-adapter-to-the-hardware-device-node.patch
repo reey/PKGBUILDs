@@ -1,0 +1,100 @@
+From patchwork Fri Jan 13 17:36:30 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Lucas Stach <l.stach@pengutronix.de>
+X-Patchwork-Id: 9516105
+Return-Path: <dri-devel-bounces@lists.freedesktop.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+	[172.30.200.125])
+	by pdx-korg-patchwork.web.codeaurora.org (Postfix) with ESMTP id
+	C698A6077E for <patchwork-dri-devel@patchwork.kernel.org>;
+	Fri, 13 Jan 2017 17:36:39 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id B726B28760
+	for <patchwork-dri-devel@patchwork.kernel.org>;
+	Fri, 13 Jan 2017 17:36:39 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id ABBAF28765; Fri, 13 Jan 2017 17:36:39 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-4.2 required=2.0 tests=BAYES_00, RCVD_IN_DNSWL_MED
+	autolearn=ham version=3.3.1
+Received: from gabe.freedesktop.org (gabe.freedesktop.org [131.252.210.177])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256
+	bits)) (No client certificate requested)
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id 4D1CD28760
+	for <patchwork-dri-devel@patchwork.kernel.org>;
+	Fri, 13 Jan 2017 17:36:39 +0000 (UTC)
+Received: from gabe.freedesktop.org (localhost [127.0.0.1])
+	by gabe.freedesktop.org (Postfix) with ESMTP id C32DF6EE33;
+	Fri, 13 Jan 2017 17:36:37 +0000 (UTC)
+X-Original-To: dri-devel@lists.freedesktop.org
+Delivered-To: dri-devel@lists.freedesktop.org
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de
+	[IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by gabe.freedesktop.org (Postfix) with ESMTPS id 421856EE33
+	for <dri-devel@lists.freedesktop.org>;
+	Fri, 13 Jan 2017 17:36:37 +0000 (UTC)
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7]
+	helo=dude.pengutronix.de.)
+	by metis.ext.pengutronix.de with esmtp (Exim 4.84_2)
+	(envelope-from <l.stach@pengutronix.de>)
+	id 1cS5mF-00046j-HC; Fri, 13 Jan 2017 18:36:35 +0100
+From: Lucas Stach <l.stach@pengutronix.de>
+To: dri-devel@lists.freedesktop.org
+Subject: [PATCH] drm: don't link DP aux i2c adapter to the hardware device
+	node
+Date: Fri, 13 Jan 2017 18:36:30 +0100
+Message-Id: <20170113173630.22138-1-l.stach@pengutronix.de>
+X-Mailer: git-send-email 2.11.0
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
+X-SA-Exim-Mail-From: l.stach@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de);
+	SAEximRunCond expanded to false
+X-PTX-Original-Recipient: dri-devel@lists.freedesktop.org
+Cc: Daniel Vetter <daniel.vetter@intel.com>, kernel@pengutronix.de,
+	patchwork-lst@pengutronix.de
+X-BeenThere: dri-devel@lists.freedesktop.org
+X-Mailman-Version: 2.1.18
+Precedence: list
+List-Id: Direct Rendering Infrastructure - Development
+	<dri-devel.lists.freedesktop.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+	<mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+	<mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+The i2c adapter on DP AUX is purely a software construct. Linking
+it to the device node of the parent device is wrong, as it leads to
+2 devices sharing the same device node, which is bad practice, as
+well as the i2c trying to populate children of the i2c adapter by
+looking at the child device nodes of the parent device.
+
+Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
+Acked-by: Thierry Reding <treding@nvidia.com>
+---
+ drivers/gpu/drm/drm_dp_helper.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/drm_dp_helper.c b/drivers/gpu/drm/drm_dp_helper.c
+index 3e6fe82c6d64..f91ade1edbde 100644
+--- a/drivers/gpu/drm/drm_dp_helper.c
++++ b/drivers/gpu/drm/drm_dp_helper.c
+@@ -1020,7 +1020,6 @@ int drm_dp_aux_register(struct drm_dp_aux *aux)
+ 	aux->ddc.class = I2C_CLASS_DDC;
+ 	aux->ddc.owner = THIS_MODULE;
+ 	aux->ddc.dev.parent = aux->dev;
+-	aux->ddc.dev.of_node = aux->dev->of_node;
+ 
+ 	strlcpy(aux->ddc.name, aux->name ? aux->name : dev_name(aux->dev),
+ 		sizeof(aux->ddc.name));
