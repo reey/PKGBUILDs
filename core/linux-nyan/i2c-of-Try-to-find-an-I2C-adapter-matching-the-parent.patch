@@ -1,0 +1,92 @@
+From patchwork Tue Sep 25 16:06:11 2018
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: i2c: of: Try to find an I2C adapter matching the parent
+X-Patchwork-Submitter: Thierry Reding <thierry.reding@gmail.com>
+X-Patchwork-Id: 974584
+Message-Id: <20180925160611.17736-1-thierry.reding@gmail.com>
+To: Wolfram Sang <wsa@the-dreams.de>
+Cc: Lucas Stach <l.stach@pengutronix.de>,
+ Andrzej Hajda <a.hajda@samsung.com>, rechner@vlado-do.de,
+ linux-i2c@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-tegra@vger.kernel.org
+Date: Tue, 25 Sep 2018 18:06:11 +0200
+From: Thierry Reding <thierry.reding@gmail.com>
+List-Id: <linux-i2c.vger.kernel.org>
+
+From: Thierry Reding <treding@nvidia.com>
+
+If an I2C adapter doesn't match the provided device tree node, also try
+matching the parent's device tree node. This allows finding an adapter
+based on the device node of the parent device that was used to register
+it.
+
+Signed-off-by: Thierry Reding <treding@nvidia.com>
+Tested-by: Vlado Plaga <rechner@vlado-do.de>
+---
+Hi Wolfram,
+
+This is a fix for the issue discussed in a long email thread a couple of
+months ago. In a nutshell the issue is that we want to be able to find a
+I2C-over-AUX adapter based on the device tree node (this is to hook up a
+I2C adapter for use as DDC to query EDID from a display panel, for
+example).
+
+Here's a link to the prior discussion, which ended up getting split into
+two for some reason, possibly because the initial submission and
+subsequent discussion took place over an extended period of time:
+
+	https://patchwork.kernel.org/patch/9516105/
+	https://patchwork.kernel.org/patch/10200879/
+
+I never got around to submitting the patch properly, but here it is. As
+mentioned in the discussion linked to above, I think the problem here is
+that the new lookup via the parent device only happens when looking for
+the adapter from its device tree node. However, this also means that the
+children for the controller won't be added for these devices, because it
+only happens for adapters that have the dev->of_node set, not for the
+node reference by dev->parent->of_node. However, I'm not sure if that's
+really a problem. A device that doesn't have dev->of_node set would be a
+"virtual" I2C bus, as in the case of I2C-over-AUX. Proper I2C busses are
+still going to have to have their dev->of_node set, otherwise any child
+devices listed in device tree won't be added.
+
+Anyway, let me know what you think of this. Also adding Lucas, Rob and
+Andrzej to the discussion since they were involved back at the time.
+
+Thanks,
+Thierry
+
+ drivers/i2c/i2c-core-of.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/i2c/i2c-core-of.c b/drivers/i2c/i2c-core-of.c
+index 6cb7ad608bcd..37d34885ea2d 100644
+--- a/drivers/i2c/i2c-core-of.c
++++ b/drivers/i2c/i2c-core-of.c
+@@ -121,6 +121,14 @@ static int of_dev_node_match(struct device *dev, void *data)
+ 	return dev->of_node == data;
+ }
+ 
++static int of_parent_node_match(struct device *dev, void *data)
++{
++	if (dev->parent)
++		return dev->parent->of_node == data;
++
++	return 0;
++}
++
+ /* must call put_device() when done with returned i2c_client device */
+ struct i2c_client *of_find_i2c_device_by_node(struct device_node *node)
+ {
+@@ -146,6 +154,9 @@ struct i2c_adapter *of_find_i2c_adapter_by_node(struct device_node *node)
+ 	struct i2c_adapter *adapter;
+ 
+ 	dev = bus_find_device(&i2c_bus_type, NULL, node, of_dev_node_match);
++	if (!dev)
++		dev = bus_find_device(&i2c_bus_type, NULL, node, of_parent_node_match);
++
+ 	if (!dev)
+ 		return NULL;
+ 
