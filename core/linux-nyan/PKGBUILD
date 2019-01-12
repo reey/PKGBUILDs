@@ -22,7 +22,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
         '99-linux.hook'
         'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch'
 	'enable-CPU-freq.patch'
-	'nyan-big_defconfig')
+	'nyan-big_defconfig'
+	'overclock-nyan.patch')
 md5sums=('SKIP'
          'SKIP'
          '61c5ff73c136ed07a7aadbf58db3d96a'
@@ -31,16 +32,15 @@ md5sums=('SKIP'
          '79fa396e3f9a09a85156d6d7c2d34b58'
          'SKIP'
 	 'SKIP'
+	 'SKIP'
 	 'SKIP')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
 
-  #git apply ../i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
   patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
-  #git apply -R ../enable-CPU-freq.patch
   patch  arch/arm/boot/dts/tegra124-nyan.dtsi < ../enable-CPU-freq.patch
-#  patch -p1 < ../enable-CPU-freq.patch
+  patch drivers/clk/tegra/clk-tegra124-dfll-fcpu.c < ../overclock-nyan.patch
 #  cat "${srcdir}/config" > ./.config
   cp ../nyan-big_defconfig arch/arm/configs/nyan-big_defconfig
   # add pkgrel to extraversion
