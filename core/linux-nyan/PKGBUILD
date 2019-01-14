@@ -15,6 +15,7 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'uboot-tools' 'vboot-utils' 'dtc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
+	'config'
         'kernel.its'
         'kernel.keyblock'
         'kernel_data_key.vbprivk'
@@ -25,6 +26,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
 	'nyan-big_defconfig'
 	'overclock-nyan.patch')
 md5sums=('SKIP'
+	 'SKIP'
          'SKIP'
          '61c5ff73c136ed07a7aadbf58db3d96a'
          '584777ae88bce2c5659960151b64c7d8'
