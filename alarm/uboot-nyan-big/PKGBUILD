@@ -1,0 +1,50 @@
+# U-Boot: Nyan Chromebooks
+# Maintainer: Kevin Mihelich <kevin@archlinuxarm.org>
+
+buildarch=4
+
+name=nyan-big
+dtb="tegra124-${name}.dtb"
+pkgname=uboot-${name}
+pkgver=2018.11
+pkgrel=1
+arch=('armv7h')
+url="http://git.denx.de/u-boot.git/"
+license=('GPL')
+makedepends=('git' 'bc' 'dtc' 'vboot-utils' 'python2' 'swig')
+conflicts=('linux-armv7-chromebook' 'linux-armv7-rc-chromebook')
+install=${pkgname}.install
+source=("ftp://ftp.denx.de/pub/u-boot/u-boot-${pkgver/rc/-rc}.tar.bz2"
+        'boot.txt'
+        'mkscr')
+md5sums=('SKIP'
+         '029cb473f59f08834b54cdc3e34c9672'
+         '021623a04afd29ac3f368977140cfbfd')
+
+prepare() {
+  cd u-boot-${pkgver/rc/-rc}
+}
+
+build() {
+  cd u-boot-${pkgver/rc/-rc}
+  unset LDFLAGS CFLAGS CXXFLAGS
+  export PYTHON=/usr/bin/python2
+  make O=b/${name} ${name}_defconfig all
+  ./b/${name}/tools/mkimage -f doc/chromium/${name}.its u-boot-chromium.fit
+  echo test >dummy.txt
+  vbutil_kernel --arch arm --keyblock doc/chromium/devkeys/kernel.keyblock \
+	--signprivate doc/chromium/devkeys/kernel_data_key.vbprivk \
+	--version 1 --config dummy.txt --vmlinuz u-boot-chromium.fit \
+	--bootloader dummy.txt --pack u-boot.kpart
+}
+
+package() {
+  cd u-boot-${pkgver/rc/-rc}
+  install -Dm644 u-boot.kpart "${pkgdir}"/boot/u-boot.kpart
+
+  install -Dm644 ../boot.txt "${pkgdir}"/boot/boot.txt
+  sed -i "s/@@FDTFILE@@/${dtb}/" "${pkgdir}"/boot/boot.txt
+  ./b/${name}/tools/mkimage -A arm -O linux -T script -C none -n "U-Boot 
+boot script" -d "${pkgdir}"/boot/boot.txt "${pkgdir}"/boot/boot.scr
+  install -Dm755 ../mkscr "${pkgdir}"/boot/mkscr
+}
