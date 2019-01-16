@@ -4,10 +4,10 @@
 buildarch=4
 
 pkgbase=linux-nyan
-_srcname=linux-4.20.1
+_srcname=linux-4.20.2
 _kernelname=${pkgbase#linux}
 _desc="ARMv7 nyan"
-pkgver=4.20.1
+pkgver=4.20.2
 pkgrel=1
 arch=('armv7h')
 url="http://www.kernel.org/"
