@@ -43,7 +43,7 @@ prepare() {
   patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
   patch  arch/arm/boot/dts/tegra124-nyan.dtsi < ../enable-CPU-freq.patch
   #patch drivers/clk/tegra/clk-tegra124-dfll-fcpu.c < ../overclock-nyan.patch
-  cat "${srcdir}/config" > ./.config
+  #cat "${srcdir}/config" > ./.config
   cp ../nyan-big_defconfig arch/arm/configs/nyan-big_defconfig
   # add pkgrel to extraversion
   sed -ri "s|^(EXTRAVERSION =)(.*)|\1 \2-${pkgrel}|" Makefile
@@ -54,7 +54,7 @@ prepare() {
 
 build() {
   cd "${srcdir}/${_srcname}"
-  #make defconfig nyan-big_defconfig
+  make defconfig nyan-big_defconfig
   # get kernel version
   make prepare
 
