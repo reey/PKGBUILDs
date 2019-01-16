@@ -12,7 +12,7 @@ arch=('armv7h')
 url="http://git.denx.de/u-boot.git/"
 license=('GPL')
 makedepends=('git' 'bc' 'dtc' 'vboot-utils' 'python2' 'swig')
-conflicts=('linux-armv7-chromebook' 'linux-armv7-rc-chromebook')
+conflicts=('linux-armv7-chromebook' 'linux-armv7-rc-chromebook' 'linux-nyan-chromebook')
 install=${pkgname}.install
 source=("ftp://ftp.denx.de/pub/u-boot/u-boot-${pkgver/rc/-rc}.tar.bz2"
         'boot.txt'
