@@ -12,21 +12,15 @@ arch=('armv7h')
 url="http://git.denx.de/u-boot.git/"
 license=('GPL')
 makedepends=('git' 'bc' 'dtc' 'vboot-utils' 'python2' 'swig')
-conflicts=('linux-armv7-chromebook' 'linux-armv7-rc-chromebook' 'linux-nyan-chromebook')
+conflicts=('linux-armv7-chromebook' 'linux-armv7-rc-chromebook')
 install=${pkgname}.install
 source=("ftp://ftp.denx.de/pub/u-boot/u-boot-${pkgver/rc/-rc}.tar.bz2"
-        'boot.txt'
-        'mkscr'
 	'uboot.patch')
 md5sums=('SKIP'
-         '029cb473f59f08834b54cdc3e34c9672'
-         '021623a04afd29ac3f368977140cfbfd'
-	 'SKIP')
+         'SKIP')
 
 prepare() {
   cd u-boot-${pkgver/rc/-rc}
-#  git apply --verbose --no-index --directory ./ ../add-padding-to-its-file.patch
- # git apply --verbose --no-index --directory ./ ../change-spi-delay.patch
   patch -p1 -i ../uboot.patch
 }
 
@@ -46,10 +40,4 @@ build() {
 package() {
   cd u-boot-${pkgver/rc/-rc}
   install -Dm644 u-boot.kpart "${pkgdir}"/boot/u-boot.kpart
-
-  install -Dm644 ../boot.txt "${pkgdir}"/boot/boot.txt
-  sed -i "s/@@FDTFILE@@/${dtb}/" "${pkgdir}"/boot/boot.txt
-  ./b/${name}/tools/mkimage -A arm -O linux -T script -C none -n "U-Boot 
-boot script" -d "${pkgdir}"/boot/boot.txt "${pkgdir}"/boot/boot.scr
-  install -Dm755 ../mkscr "${pkgdir}"/boot/mkscr
 }
