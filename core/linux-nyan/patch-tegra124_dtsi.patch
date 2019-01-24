@@ -1,0 +1,13 @@
+--- linux-4.20.2/linux-4.20.2/arch/arm/boot/dts/tegra124.dtsi	2019-01-13 08:24:10.000000000 +0000
++++ linux-4.20.2.patch/linux-4.20.2/arch/arm/boot/dts/tegra124.dtsi	2019-01-24 19:34:31.992513251 +0000
+@@ -13,9 +13,8 @@
+ 	#address-cells = <2>;
+ 	#size-cells = <2>;
+ 
+-	memory@80000000 {
++	memory {
+ 		device_type = "memory";
+-		reg = <0x0 0x80000000 0x0 0x0>;
+ 	};
+ 
+ 	pcie@1003000 {

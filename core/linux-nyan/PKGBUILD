@@ -4,10 +4,10 @@
 buildarch=4
 
 pkgbase=linux-nyan
-_srcname=linux-4.20.2
+_srcname=linux-4.20.4
 _kernelname=${pkgbase#linux}
 _desc="ARMv7 nyan"
-pkgver=4.20.2
+pkgver=4.20.4
 pkgrel=1
 arch=('armv7h')
 url="http://www.kernel.org/"
@@ -24,7 +24,9 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.xz"
         'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch'
 	'enable-CPU-freq.patch'
 	'nyan-big_defconfig'
-	'overclock-nyan.patch')
+	'overclock-nyan.patch'
+	'patch-tegra124_dtsi.patch'
+	'patch-tegra124-nyan_dtsi.patch')
 md5sums=('SKIP'
 	 'SKIP'
          'SKIP'
@@ -35,13 +37,17 @@ md5sums=('SKIP'
          'SKIP'
 	 'SKIP'
 	 'SKIP'
+	 'SKIP'
+	 'SKIP'
 	 'SKIP')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
 
   patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
-  patch  arch/arm/boot/dts/tegra124-nyan.dtsi < ../enable-CPU-freq.patch
+  patch arch/arm/boot/dts/tegra124-nyan.dtsi < ../enable-CPU-freq.patch
+  patch arch/arm/boot/dts/tegra124.dtsi < ../patch-tegra124_dtsi.patch
+  patch arch/arm/boot/dts/tegra124-nyan.dtsi < ../patch-tegra124-nyan_dtsi.patch
   #patch drivers/clk/tegra/clk-tegra124-dfll-fcpu.c < ../overclock-nyan.patch
   #cat "${srcdir}/config" > ./.config
   cp ../nyan-big_defconfig arch/arm/configs/nyan-big_defconfig

@@ -1,0 +1,11 @@
+--- linux-4.20.2/linux-4.20.2/arch/arm/boot/dts/tegra124-nyan.dtsi	2019-01-13 08:24:10.000000000 +0000
++++ linux-4.20.2.patch/linux-4.20.2/arch/arm/boot/dts/tegra124-nyan.dtsi	2019-01-24 19:34:44.022222093 +0000
+@@ -13,7 +13,7 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
+-	memory@80000000 {
++	memory {
+ 		reg = <0x0 0x80000000 0x0 0x80000000>;
+ 	};
+ 
