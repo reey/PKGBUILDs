@@ -3,8 +3,8 @@
 
 buildarch=4
 
-_rcver=4.20
-_rcrel=7
+_rcver=5.1
+_rcrel=1
 
 pkgbase=linux-nyan-rc
 _srcname=linux-${_rcver}-rc${_rcrel}
@@ -24,7 +24,7 @@ source=("https://git.kernel.org/torvalds/t/${_srcname}.tar.gz"
         'kernel_data_key.vbprivk'
         'linux.preset'
         '99-linux.hook'
-        'drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch')
+        'nyan-big_defconfig')
 md5sums=('SKIP'
          'SKIP'
          '4f2379ed84258050edb858ee8d281678'
@@ -36,10 +36,7 @@ md5sums=('SKIP'
 
 prepare() {
   cd "${srcdir}/${_srcname}"
-
-  #git apply ../i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
-  patch -Rp1 < ../drm-don-t-link-DP-aux-i2c-adapter-to-the-hardware-device-node.patch
-  cat "${srcdir}/config" > ./.config
+  cp ../nyan-big_defconfig arch/arm/configs/nyan-big_defconfig
 
   # add pkgrel to extraversion
   sed -ri "s|^(EXTRAVERSION =)(.*)|\1 \2-${pkgrel}|" Makefile
@@ -50,7 +47,7 @@ prepare() {
 
 build() {
   cd "${srcdir}/${_srcname}"
-
+  make defconfig nyan-big_defconfig
   # get kernel version
   make prepare
 
