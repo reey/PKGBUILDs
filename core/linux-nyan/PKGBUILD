@@ -4,10 +4,10 @@
 buildarch=4
 
 pkgbase=linux-nyan
-_srcname=linux-5.0
+_srcname=linux-5.1
 _kernelname=${pkgbase#linux}
 _desc="ARMv7 nyan"
-pkgver=5.0
+pkgver=5.1
 pkgrel=1
 arch=('armv7h')
 url="http://www.kernel.org/"
@@ -42,9 +42,9 @@ md5sums=('SKIP'
 prepare() {
   cd "${srcdir}/${_srcname}"
 
-  patch -p1 < ../v2-i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
+  #patch -p1 < ../v2-i2c-of-Try-to-find-an-I2C-adapter-matching-the-parent.patch
   patch -p1 < ../enable-cec-for-nyan.patch
-  patch -p1 < ../drm-tegra-Fix-IOVA-space-on-Tegra186-and-later.patch
+  #patch -p1 < ../drm-tegra-Fix-IOVA-space-on-Tegra186-and-later.patch
   patch arch/arm/boot/dts/tegra124-nyan.dtsi < ../enable-CPU-freq.patch
   #patch drivers/clk/tegra/clk-tegra124-dfll-fcpu.c < ../overclock-nyan.patch
   cp ../nyan-big_defconfig arch/arm/configs/nyan-big_defconfig
